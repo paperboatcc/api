@@ -4,9 +4,6 @@ import os, glob, importlib, time
 
 app = Sanic("api.fasmga.org")
 
-@app.route("/")
-async def main(request): return empty()
-
 if (os.environ.get("developer") == "True"): print("Warning! You are running into a developer mode, make sure you don't are using this for run production!")
 print(f"Discovering plug-in for {app.name}!")
 print("-------------------------------------------------------")
