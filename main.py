@@ -24,9 +24,3 @@ if (os.environ.get("developer") == "True"):
 	app.run(debug = True, auto_reload = False)
 else: 
 	app.run()
-
-"""
-:)
-cmq va bene cosi?
-ottimo
-"""
