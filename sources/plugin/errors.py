@@ -6,4 +6,4 @@ def plug_in():
 	app = Sanic.get_app("api.fasmga")
 
 	@app.exception(NotFound)
-	async def error_404(request, exception): return html(open("Sources/main.html").read())
+	async def error_404(request, exception): return html(open("Sources/html/404.html").read())

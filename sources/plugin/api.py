@@ -17,9 +17,10 @@ def plug_in():
 
 	app.add_task(ratelimit)
 
-	@app.route("/ratelimit", methods = ["post", "get"])
+	@app.post("/ratelimit")
 	@ratelimitCheck()
 	async def _ratelimit(request):
+		print(request.form)
 		return json({ "authorized": True, "message": "You can continue to use fasmga!" })
 
 	
