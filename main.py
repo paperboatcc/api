@@ -1,4 +1,5 @@
 from sanic import Sanic
+from sanic.response import text
 from sanic.log import logger
 from motor import motor_asyncio as motor
 import os, glob, importlib, dotenv
