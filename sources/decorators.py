@@ -13,12 +13,12 @@ def ratelimitCheck():
 		async def decorated_function(request, *args, **kwargs):
 			if not request.form.get("token"): 
 				return json({ "bad_request": "You must do a request with token value!" }, 400)
-			userData = await app.ctx.db.users.find_one({ "login_token": request.form.get("token") })
-			user = userData["username"]# seha massi z
+			userData = await app.ctx.db.users.find_one({ "api_token": request.form.get("token") })
 			if not userData:
 				return json({ "bad_request": "Token you provvided is invalid" }, 400)
+			user = userData["username"]
 			if (userData["is_banned"] == True): 
-				return json({ "banned": "You are banned from api, you can try to contact fasmga staff to get unbam" }, 401)
+				return json({ "banned": "You are banned from api, you can try to contact fasmga staff to get unban" }, 401)
 
 			jsonValue = jsonModule.load(open("sources/ratelimit.json", "r"))
 			if not user in jsonValue: jsonValue[user] = 0
@@ -34,7 +34,7 @@ def ratelimitCheck():
 					if (jsonValue[user] == 50):
 						webhook.post(content = f"⚠️ | Warning, {user} done 50 request in less than a minute") 
 					if (jsonValue[user] == 100):
-						await app.ctx.db.users.find_one_and_update({ "login_token": request.form.get("token") }, { "$set": { "is_banned": True }})
+						await app.ctx.db.users.find_one_and_update({ "api_token": request.form.get("token") }, { "$set": { "is_banned": True }})
 						webhook.post(content = f"ℹ️ | Just for information, I banned {user} because it did 100 requests in less than a minute")
 						return json({ "SOTP": "okey, but now STOP! then i obbligated to ban you, you can try to contact fasmga staff to get unban" }, 401)
 					return json({ "ddos": "Are you trying to DDoS our API? Asking for a friend :)" }, 429)

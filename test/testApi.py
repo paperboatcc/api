@@ -2,9 +2,9 @@ import aiohttp
 import asyncio
 
 async def main():
-	while True:
+	#while True:
 		async with aiohttp.ClientSession() as session:
-			async with session.post("http://localhost:8000/ratelimit", data= {"token": "test", "testtt": "value2"} ) as response:
+			async with session.post("http://localhost:8000/internal/create", data= {"token": "test", "password": "", "url": "https://noice.link", "idtype": "abcdefgh", "nsfw": "y"} ) as response:
 				print(f"Status: {response.status}")
 				print(f"Content-type: {response.headers['content-type']}\n")
 				html = await response.text()
