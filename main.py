@@ -1,11 +1,15 @@
 from sanic import Sanic
-from sanic.response import text
 from sanic.log import logger
 from motor import motor_asyncio as motor
-import os, glob, importlib, dotenv
+from discordwebhook import Discord
+import os
+import glob
+import importlib
+import dotenv
 
 dotenv.load_dotenv()
 app = Sanic("api.fasmga")
+app.ctx.webhook = Discord(url = os.getenv("DiscordWebHook"))
 
 #region plug-in handling
 

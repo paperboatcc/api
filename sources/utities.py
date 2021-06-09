@@ -1,4 +1,7 @@
-import random, string
+import asyncio
+import random
+import string
+import json
 
 def generateUrlID(idtype):
 	if idtype == "abcdefgh":
@@ -10,3 +13,7 @@ def generateUrlID(idtype):
 	elif idtype == "aBCde":
 		urlid = str().join(random.choice(string.ascii_letters) for i in range(5))
 		return urlid
+
+async def tempBanRemove(app, token):
+	await asyncio.sleep(600)
+	await app.ctx.db.users.find_one_and_update({ "api_token": token }, { "$set": { "is_banned": False }})

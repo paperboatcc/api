@@ -1,14 +1,17 @@
 from sanic import Sanic
 from sanic.response import json
-from sources.decorators import ratelimitCheck
+from sources.decorators import internalRoute, ratelimitCheck
 from sources.utities import generateUrlID
-import validators, string, distutils.util, hashlib
+import validators
+import distutils.util
+import hashlib
 
 def plug_in():
 	app = Sanic.get_app("api.fasmga")
 
 	@app.post("/internal/create")
 	@ratelimitCheck()
+	@internalRoute()
 	async def internal_create(request):
 		if not request.form.get("url"): return json({ "error": "Missing \"url\" value into the request" }, 400)
 		if not request.form.get("idtype"): return json({ "error": "Missing \"idtype\" value into the request" }, 400)
@@ -30,7 +33,7 @@ def plug_in():
 				"ID": urlID,
 				"redirect_url": request.form.get("url"),
 				"owner": userData["username"],
-				"password": hashlib.sha512(request.form.get("password").encode()).hexdigest() or "",
+				"password": hashlib.sha512((request.form.get("password") or "").encode()).hexdigest(),
 				"nsfw": nsfw
 			}
 		)
