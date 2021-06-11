@@ -5,10 +5,11 @@ import sys
 url = "http://localhost:8000/internal/create"
 data = {
 	"token": "test",
-	"password": "",
+	#"password": "",
 	"url": "https://tuna.com", 
 	"idtype": "abcdefgh", 
-	"nsfw": False
+	"nsfw": False,
+	"login": False
 }
 
 async def main():
@@ -18,14 +19,14 @@ async def main():
 	if doWhile:
 		async with aiohttp.ClientSession() as session:
 			while True:
-				async with session.post(url, data = data) as response:
+				async with session.post(url = url, data = data) as response:
 					print(f"Status: {response.status}")
 					print(f"Content-type: {response.headers['content-type']}\n")
 					html = await response.text()
 					print(f"Result: {html}\n\n")
 	else:
 		async with aiohttp.ClientSession() as session:
-			async with session.post(url, data = data) as response:
+			async with session.post(url = url, data = data) as response:
 				print(f"Status: {response.status}")
 				print(f"Content-type: {response.headers['content-type']}\n")
 				html = await response.text()
