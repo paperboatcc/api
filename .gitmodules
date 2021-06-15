@@ -1,3 +1,0 @@
-[submodule "test/api"]
-	path = test/api
-	url = https://github.com/fasm-ga/api
