@@ -1,0 +1,5 @@
+[submodule "D:\\Develop\\Project\\Fasm.ga\\api.fasmga\\test\\test2"]
+	url = https://github.com/fasm-ga/api
+[submodule "test/apis"]
+	path = test/apis
+	url = https://github.com/fasm-ga/api

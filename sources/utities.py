@@ -1,7 +1,15 @@
+from sanic import Sanic
+from sanic.response import html
 import asyncio
 import random
 import string
-import json
+
+app = Sanic.get_app("api.fasmga")
+
+def render_template(file, **args):
+	template = app.ctx.jinja.get_template(str(file))
+	htmlPage = template.render(args)
+	return html(htmlPage)
 
 def generateUrlID(idtype):
 	if idtype == "abcdefgh":

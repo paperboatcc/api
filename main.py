@@ -1,5 +1,6 @@
 from sanic import Sanic
 from sanic.log import logger
+from jinja2 import FileSystemLoader, Environment
 from motor import motor_asyncio as motor
 from discordwebhook import Discord
 import os
@@ -10,10 +11,12 @@ import dotenv
 dotenv.load_dotenv()
 app = Sanic("api.fasmga")
 app.ctx.webhook = Discord(url = os.getenv("DiscordWebHook"))
+app.ctx.jinja = Environment(loader = FileSystemLoader(searchpath = "./html"))
+app.debug = os.getenv("developer") == "true"
 
 #region plug-in handling
 
-if (os.getenv("developer") == "True"): logger.warning("You are running into developer mode, make sure you don't are using this for run production!")
+if app.debug: logger.warning("You are running into developer mode, make sure you don't are using this for run production!")
 logger.info(f"Discovering plug-in for {app.name}!")
 logger.info("-------------------------------------------------------")
 for filename in [os.path.basename(f)[:-3] for f in glob.glob(os.path.join(os.path.dirname("./sources/plugin/"), "*.py")) if os.path.isfile(f)]:
@@ -23,7 +26,8 @@ for filename in [os.path.basename(f)[:-3] for f in glob.glob(os.path.join(os.pat
 		module.plug_in()
 	except Exception as error:
 		logger.error(f"Error loading {filename}")
-		logger.error(error)
+		if app.debug: logger.error(error)
+		else: logger.info("To see error set 'developer' env value to 'true'")
 	else: 
 		logger.info(f"{filename} loaded successfully!")
 	logger.info("-------------------------------------------------------")
@@ -45,7 +49,7 @@ def closingMotor(app, loop):
 
 #endregion
 
-if (os.getenv("developer") == "True"): 
-	app.run(debug = True, auto_reload = False)
+if app.debug: 
+	app.run(debug = True, auto_reload = True)
 else: 
 	app.run()
