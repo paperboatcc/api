@@ -56,6 +56,36 @@ def plug_in():
    
 		return json({ "success": f"/{urlID}" })
 
+	@app.post("/internal/edit")
+	@ratelimitCheck()
+	@internalRoute()
+	async def internal_edit(request):
+		if not request.form.get("id"): return json({ "error": 'Missing "id" value into the request' }, 400)
+		if not (request.form.get("id") or request.form.get("password") or request.form.get("nsfw")): return json({ "error": 'Missing "url" or "password" or "nsfw" value(s) into the request' }, 400)
+		if request.form.get("url") and not validators.url(request.form.get("url")): return json({ "error": 'Value "url" is invalid' }, 400)
+		if request.form.get("nsfw"):
+			try: nsfw = distutils.util.strtobool(request.form.get("nsfw").lower())
+			except: return json({ "error": 'Value "nsfw" is invalid' }, 400)
+			if nsfw == 1: nsfw = True
+			else: nsfw = False
+		else:
+			nsfw = None
+		urlDocument =  await app.ctx.db.urls.find_one({ "ID": request.form.get("id") })
+		if not urlDocument: return json({ "error": 'Value "id" is invalid' }, 400)
+		if request.form.get("password"): password = hashlib.sha512((request.form.get("password")).encode()).hexdigest()
+		else: password = ""
+		if nsfw == None: nsfw = urlDocument["nsfw"]
+		await app.ctx.db.urls.find_one_and_update({ "ID": request.form.get("id") }, 
+			{
+				"$set": {
+					"redirect_url": request.form.get("url") or urlDocument["redirect_url"],
+					"password": password or urlDocument["password"],
+					"nsfw": nsfw
+				}
+			}
+		)
+		return json({ "success": "success" })
+ 
 	@app.post("/internal/list")
 	@ratelimitCheck()
 	@internalRoute()
@@ -76,4 +106,4 @@ def plug_in():
 		urlDocument =  await app.ctx.db.urls.find_one({ "ID": request.form.get("id") })
 		if not urlDocument: return json({ "error": 'Value "id" is invalid' }, 400)
 		await app.ctx.db.urls.find_one_and_delete({ "ID": request.form.get("id") })
-		return json({ "success": f"{request.form.get('id')} is now deleted" })
+		return json({ "success": "success" })

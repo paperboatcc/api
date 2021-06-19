@@ -3,14 +3,14 @@ import asyncio
 import sys
 import json
 
-url = "http://localhost:8000/internal/delete"
+url = "http://localhost:8000/internal/edit"
 data = {
 	"token": "test",
-	"id": "smofwmat"
-	#"password": "",
-	#"url": "https://tuna.com", 
+	"id": "cqvqnpik",
+	#"password": "MONA",
+	#"url": "https://example.com", 
 	#"idtype": "abcdefgh", 
-	#"nsfw": False,
+  "nsfw": False,
 	#"login": False
 }
 
