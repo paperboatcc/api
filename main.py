@@ -1,4 +1,3 @@
-from tkinter.tix import Tree
 from sanic import Sanic
 from sanic.log import logger
 from jinja2 import FileSystemLoader, Environment
