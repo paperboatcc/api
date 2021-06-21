@@ -40,13 +40,15 @@ def plug_in():
 			while await app.ctx.db.urls.find_one({ "ID": urlID }):
 				urlID = generateUrlID(request.form.get("idtype"))
 		userData = await app.ctx.db.users.find_one({ "api_token": request.form.get("token") })
+		if request.form.get("password"): password = hashlib.sha512((request.form.get("password")).encode()).hexdigest()
+		else: password = ""
 		if login:
 			app.ctx.db.urls.insert_one(
 				{
 					"ID": urlID,
 					"redirect_url": request.form.get("url"),
 					"owner": userData["username"],
-					"password": hashlib.sha512((request.form.get("password") or "").encode()).hexdigest(),
+					"password": password,
 					"nsfw": nsfw
 				}
 			)
@@ -56,7 +58,7 @@ def plug_in():
 					"ID": urlID,
 					"redirect_url": request.form.get("url"),
 					"owner": "anonymous",
-					"password": hashlib.sha512((request.form.get("password") or "").encode()).hexdigest(),
+					"password": password,
 					"nsfw": nsfw
 				}
 			)
