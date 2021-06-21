@@ -3,15 +3,15 @@ import asyncio
 import sys
 import json
 
-url = "http://localhost:8000/internal/edit"
+url = "http://localhost:8000/internal/create"
 data = {
 	"token": "test",
-	"id": "cqvqnpik",
-	#"password": "MONA",
-	#"url": "https://example.com", 
-	#"idtype": "abcdefgh", 
+	"id": "xaydzajb",
+	"password": "",
+	"url": "https://example.com", 
+	"idtype": "abcdefgh", 
   "nsfw": False,
-	#"login": False
+	"login": True
 }
 
 async def main():
