@@ -1,0 +1,10 @@
+# Create sanic server
+sanic
+jinja2
+motor
+discordwebhook
+python-dotenv
+validators
+
+# For Testing
+aiohttp

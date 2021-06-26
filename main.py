@@ -3,10 +3,13 @@ from sanic.log import logger
 from jinja2 import FileSystemLoader, Environment
 from motor import motor_asyncio as motor
 from discordwebhook import Discord
+import json
 import os
+import asyncio
 import glob
 import importlib
 import dotenv
+
 
 dotenv.load_dotenv()
 app = Sanic("api.fasmga")
@@ -50,6 +53,27 @@ def setupMotor(app, loop):
 def closingMotor(app, loop):
 	logger.info("Closing motor conntenction")
 	app.ctx.database.close()
+
+#endregion
+#region Ratelimit handling
+
+async def ratelimitReset():
+	while True:
+		jsonValues = json.load(open("sources/ratelimit.json"))
+		for jsonValue in jsonValues:
+			jsonValues[jsonValue] = 0
+		json.dump(jsonValues, open("sources/ratelimit.json", "w"), indent = 2, sort_keys = True)
+		await asyncio.sleep(60)
+
+@app.listener("before_server_start")
+def creating_tasks(app, loop):
+	global ratelimit_reset
+	ratelimit_reset = loop.create_task(ratelimitReset())
+
+@app.listener("before_server_stop")
+def closing_tasks(app, loop):
+  ratelimit_reset.cancel()
+  
 
 #endregion
 

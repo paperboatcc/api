@@ -14,7 +14,7 @@ def plug_in():
 	@internalRoute()
 	async def internal_create(request):
 		try: login = distutils.util.strtobool(request.form.get("login").lower())
-		except: return json({ "error": 'Value "nsfw" is invalid' }, 400)
+		except: return json({ "error": 'Value "login" is invalid' }, 400)
 		if login == 1: nsfw = True
 		else: login = False
 		if not request.form.get("url"): return json({ "error": 'Missing "url" value into the request' }, 400)
@@ -35,12 +35,13 @@ def plug_in():
 		if request.form.get("url") in blacklist["blacklist"]: return json({ "error": 'Value "url" contains an url blacklisted' }, 403)
 		if login == True and request.form.get("id"):
 			urlID = request.form.get("id")
+			if (await app.ctx.db.urls.find_one({ "ID": urlID })): return json({ "error": "An url with this ID alredy exist" }, 403)
 		else:
 			urlID = generateUrlID(request.form.get("idtype"))
 			while await app.ctx.db.urls.find_one({ "ID": urlID }):
 				urlID = generateUrlID(request.form.get("idtype"))
 		userData = await app.ctx.db.users.find_one({ "api_token": request.form.get("token") })
-		if request.form.get("password"): password = hashlib.sha512((request.form.get("password")).encode()).hexdigest()
+		if request.form.get("password"): password = hashlib.sha512((request.form.get("password")).encode()).hexdigest() #TODO: Change ""encrypt"" method
 		else: password = ""
 		if login:
 			app.ctx.db.urls.insert_one(
@@ -70,7 +71,7 @@ def plug_in():
 	@internalRoute()
 	async def internal_edit(request):
 		try: login = distutils.util.strtobool(request.form.get("login").lower())
-		except: return json({ "error": 'Value "nsfw" is invalid' }, 400)
+		except: return json({ "error": 'Value "login" is invalid' }, 400)
 		if login == 1: nsfw = True
 		else: login = False
 		if not login == True: return json({ "error": "You need to be logged in" }, 401)
@@ -88,7 +89,7 @@ def plug_in():
 		if not urlDocument: return json({ "error": 'Value "id" is invalid' }, 400)
 		userDocument = await app.ctx.db.users.find_one({ "api_token": request.form.get("token") })
 		if not userDocument["username"] == urlDocument["owner"]: return json({ "error": "This url is not your" }, 403)
-		if request.form.get("password"): password = hashlib.sha512((request.form.get("password")).encode()).hexdigest()
+		if request.form.get("password"): password = hashlib.sha512((request.form.get("password")).encode()).hexdigest() #TODO: Change ""encrypt"" method
 		else: password = ""
 		if nsfw == None: nsfw = urlDocument["nsfw"]
 		await app.ctx.db.urls.find_one_and_update({ "ID": request.form.get("id") }, 
@@ -107,7 +108,7 @@ def plug_in():
 	@internalRoute()
 	async def internal_list(request):
 		try: login = distutils.util.strtobool(request.form.get("login").lower())
-		except: return json({ "error": 'Value "nsfw" is invalid' }, 400)
+		except: return json({ "error": 'Value "login" is invalid' }, 400)
 		if login == 1: nsfw = True
 		else: login = False
 		if not login == True: return json({ "error": "You need to be logged in" }, 401)
@@ -124,7 +125,7 @@ def plug_in():
 	@internalRoute()
 	async def internal_delete(request):
 		try: login = distutils.util.strtobool(request.form.get("login").lower())
-		except: return json({ "error": 'Value "nsfw" is invalid' }, 400)
+		except: return json({ "error": 'Value "login" is invalid' }, 400)
 		if login == 1: nsfw = True
 		else: login = False
 		if not login == True: return json({ "error": "You need to be logged in" }, 401)

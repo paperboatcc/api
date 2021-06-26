@@ -3,7 +3,7 @@ import asyncio
 import sys
 import json
 
-url = "http://localhost:8000/internal/create"
+url = "http://localhost:8000/create"
 data = {
 	"token": "test",
 	"id": "xaydzajb",
@@ -33,7 +33,7 @@ async def main():
 				print(f"Content-type: {response.headers['content-type']}\n")
 				html = await response.text()
 				print(f"Result: {html}\n\n")
-				#jsonV = json.loads(html)
+				#print(json.loads(html))
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(main())
