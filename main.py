@@ -5,6 +5,7 @@ from motor import motor_asyncio as motor
 from discordwebhook import Discord
 import json
 import os
+import platform
 import asyncio
 import glob
 import importlib
@@ -17,7 +18,8 @@ app.ctx.webhook = Discord(url = os.getenv("DiscordWebHook"))
 app.ctx.jinja = Environment(loader = FileSystemLoader(searchpath = "./html"))
 app.config.update(
   { 
-   "debug": os.getenv("developer") == "true" 
+   "debug": os.getenv("developer") == "true",
+	 "vpsDebug": os.getenv("developer") == "true" and platform.system() == "Linux"
   }
 )
 
@@ -46,7 +48,7 @@ logger.info("Done!")
 @app.listener("before_server_start")
 def setupMotor(app, loop):
 	logger.info("Opening motor connection to database")
-	app.ctx.database = motor.AsyncIOMotorClient(os.getenv("MongoDB"), io_loop=loop)
+	app.ctx.database = motor.AsyncIOMotorClient(os.getenv("MongoDB"), io_loop=loop, tls=True, tlsAllowInvalidCertificates=True)
 	app.ctx.db = app.ctx.database.fasmga
 
 @app.listener("before_server_stop")
@@ -77,7 +79,9 @@ def closing_tasks(app, loop):
 
 #endregion
 
-if app.config.get("debug"):
-	app.run(debug = True, auto_reload = False)
+if app.config.get("vpsDebug"):
+  app.run(host= "0.0.0.0", port = 2002, debug = True, auto_reload = False)
+elif app.config.get("debug"):
+  app.run(debug = True, auto_reload = False)
 else:
-  app.run()
+  app.run(host = "0.0.0.0.", port = 2002)

@@ -52,7 +52,7 @@ def internalRoute():
 			if userData["is_banned"]:
 				return json({ "banned": "You are banned from api, you can try to contact fasmga staff to get unban" }, 401)
 			user = userData['username']
-			if not (request.ip == socket.gethostbyname("fasmga.org") or request.ip == "127.0.0.1"):
+			if not request.ip == "127.0.0.1":
 				await app.ctx.db.users.find_one_and_update({ "api_token": request.form.get("token") }, { "$set": { "is_banned": True }})
 				app.add_task(tempBanRemove(request.form.get("token")))
 				app.ctx.webhook.post(content = f"⚠️ | Warning, {user} is trying to access to internal APIs", username = "Fasm.ga Iternal")

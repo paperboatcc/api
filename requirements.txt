@@ -2,6 +2,7 @@
 sanic
 jinja2
 motor
+dnspython
 discordwebhook
 python-dotenv
 validators

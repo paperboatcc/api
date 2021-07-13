@@ -3,14 +3,14 @@ import asyncio
 import sys
 import json
 
-url = "http://localhost:8000/create"
+url = "http://localhost:2002/internal/create"
 data = {
-	"token": "test",
-	"id": "xaydzajb",
+	"token": "kixIegOjXWmOoWAEbaoBfFDqYRaCKNHBKiWTEHPrhVWJDJECoDkDtgVngPorLgJKA",
+	#"id": "xaydzajb",
 	"password": "",
 	"url": "https://example.com", 
 	"idtype": "abcdefgh", 
-  "nsfw": False,
+	"nsfw": False,
 	"login": True
 }
 
