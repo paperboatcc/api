@@ -4,7 +4,7 @@ jinja2
 motor
 dnspython
 discordwebhook
-python-dotenv
+python-dotenv 
 validators
 
 # For Testing

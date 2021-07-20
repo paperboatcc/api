@@ -8,11 +8,13 @@ import os
 import platform
 import asyncio
 import glob
+import ssl
 import importlib
 import dotenv
 
-
 dotenv.load_dotenv()
+context = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
+context.load_cert_chain("/home/parliamodipc/ssl/certificate.pem", keyfile="/home/parliamodipc/ssl/private-key.pem")
 app = Sanic("api.fasmga")
 app.ctx.webhook = Discord(url = os.getenv("DiscordWebHook"))
 app.ctx.jinja = Environment(loader = FileSystemLoader(searchpath = "./html"))
@@ -80,8 +82,8 @@ def closing_tasks(app, loop):
 #endregion
 
 if app.config.get("vpsDebug"):
-  app.run(host= "0.0.0.0", port = 2002, debug = True, auto_reload = False)
+  app.run(host= "0.0.0.0", port = 2002, debug = True, auto_reload = False, ssl = context)
 elif app.config.get("debug"):
   app.run(debug = True, auto_reload = False)
 else:
-  app.run(host = "0.0.0.0.", port = 2002)
+  app.run(host = "0.0.0.0", port = 2002, ssl = context)

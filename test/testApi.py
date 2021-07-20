@@ -3,7 +3,7 @@ import asyncio
 import sys
 import json
 
-url = "http://localhost:2002/internal/create"
+url = "https://fasmvps.ga:2002/create"
 data = {
 	"token": "kixIegOjXWmOoWAEbaoBfFDqYRaCKNHBKiWTEHPrhVWJDJECoDkDtgVngPorLgJKA",
 	#"id": "xaydzajb",
@@ -11,7 +11,7 @@ data = {
 	"url": "https://example.com", 
 	"idtype": "abcdefgh", 
 	"nsfw": False,
-	"login": True
+	#"login": True
 }
 
 async def main():
@@ -19,7 +19,7 @@ async def main():
 	except: doWhile = False
 
 	if doWhile:
-		async with aiohttp.ClientSession() as session:
+		async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
 			while True:
 				async with session.post(url = url, data = data) as response:
 					print(f"Status: {response.status}")
@@ -27,13 +27,14 @@ async def main():
 					html = await response.text()
 					print(f"Result: {html}\n\n")
 	else:
-		async with aiohttp.ClientSession() as session:
+		async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
 			async with session.post(url = url, data = data) as response:
 				print(f"Status: {response.status}")
 				print(f"Content-type: {response.headers['content-type']}\n")
 				html = await response.text()
 				print(f"Result: {html}\n\n")
-				#print(json.loads(html))
+				print(json.loads(html))
+				print(json.loads(html)["success"])
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(main())
