@@ -50,7 +50,8 @@ def plug_in():
 					"redirect_url": request.form.get("url"),
 					"owner": userData["username"],
 					"password": password,
-					"nsfw": nsfw
+					"nsfw": nsfw,
+				"clicks": 0
 				}
 			)
 		else:
@@ -60,7 +61,8 @@ def plug_in():
 					"redirect_url": request.form.get("url"),
 					"owner": "anonymous",
 					"password": password,
-					"nsfw": nsfw
+					"nsfw": nsfw,
+				"clicks": 0
 				}
 			)
    
