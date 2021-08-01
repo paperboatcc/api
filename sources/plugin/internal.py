@@ -33,9 +33,10 @@ def plug_in():
 		else: login = False
 		blacklist = await app.ctx.db.config.find_one({ "type": "blacklist" })
 		if request.form.get("url") in blacklist["blacklist"]: return json({ "error": 'Value "url" contains an url blacklisted' }, 403)
-		if login == True and request.form.get("id"):
+		if request.form.get("id"):
 			urlID = request.form.get("id")
-			if (await app.ctx.db.urls.find_one({ "ID": urlID })): return json({ "error": "An url with this ID alredy exist" }, 403)
+			if len(urlID) > 30: return json({ "error": "This ID is too long (>30)" }, 403)
+			if (await app.ctx.db.urls.find_one({ "ID": urlID })): return json({ "error": "An url with this ID already exists" }, 403)
 		else:
 			urlID = generateUrlID(request.form.get("idtype"))
 			while await app.ctx.db.urls.find_one({ "ID": urlID }):
