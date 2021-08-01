@@ -30,8 +30,8 @@ def plug_in():
 		if request.form.get("url") in blacklist["blacklist"]: return json({ "error": 'Value "url" contains an url blacklisted' }, 403)
 		if request.form.get("id"):
 			urlID = request.form.get("id")
-			if len(urlID) > 30: return json({ "error": "This ID is too long (>30)" }, 403)
-			if any(bad_character in urlID for bad_character in ["?", "#", "/", "\\", "<", ">"]): return json({ "error": "This ID contains a prohibited character (?, #, \\, <, >" }, 403)
+			if len(urlID) > 30: return json({ "error": "This ID is too long (>30)" }, 400)
+			if any(bad_character in urlID for bad_character in ["?", "#", "/", "\\", "<", ">"]): return json({ "error": "This ID contains a prohibited character (?, #, \\, <, >" }, 400)
 			if (await app.ctx.db.urls.find_one({ "ID": urlID })): return json({ "error": "An url with this ID alredy exist" }, 403)
 		else:
 			urlID = generateUrlID(request.form.get("idtype"))
