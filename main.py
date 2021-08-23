@@ -50,7 +50,7 @@ logger.info("Done!")
 @app.listener("before_server_start")
 def setupMotor(app, loop):
 	logger.info("Opening motor connection to database")
-	app.ctx.database = motor.AsyncIOMotorClient(os.getenv("MongoDB"), io_loop=loop, tls=True, tlsAllowInvalidCertificates=True)
+	app.ctx.database = motor.AsyncIOMotorClient(os.getenv("MongoDB"), io_loop=loop, tls=True, tlsAllowInvalidCertificates=True, ssl_cert_reqs=ssl.CERT_NONE)
 	app.ctx.db = app.ctx.database.fasmga
 
 @app.listener("before_server_stop")
