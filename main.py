@@ -19,7 +19,7 @@ app = Sanic("api.fasmga")
 app.ctx.webhook = Discord(url = os.getenv("DiscordWebHook"))
 app.ctx.jinja = Environment(loader = FileSystemLoader(searchpath = "./html"))
 app.config.update(
-  { 
+  {
    "debug": os.getenv("developer") == "true",
 	 "vpsDebug": os.getenv("developer") == "true" and platform.system() == "Linux"
   }
@@ -28,7 +28,7 @@ app.config.update(
 #region plug-in handling
 
 if app.config.get("debug"): logger.warning("You are running into developer mode, make sure you don't are using this for run production!")
-logger.info(f"Discovering plug-in for {app.name}!")
+logger.info(f"Discorvering plug-in for {app.name}!")
 logger.info("-------------------------------------------------------")
 for filename in [os.path.basename(f)[:-3] for f in glob.glob(os.path.join(os.path.dirname("./sources/plugin/"), "*.py")) if os.path.isfile(f)]:
 	module = importlib.import_module(f"sources.plugin.{filename}")
@@ -50,7 +50,7 @@ logger.info("Done!")
 @app.listener("before_server_start")
 def setupMotor(app, loop):
 	logger.info("Opening motor connection to database")
-	app.ctx.database = motor.AsyncIOMotorClient(os.getenv("MongoDB"), io_loop=loop, tls=True, tlsAllowInvalidCertificates=True, ssl_cert_reqs=ssl.CERT_NONE)
+	app.ctx.database = motor.AsyncIOMotorClient(os.getenv("MongoDB"), io_loop = loop, tls = False)
 	app.ctx.db = app.ctx.database.fasmga
 
 @app.listener("before_server_stop")
