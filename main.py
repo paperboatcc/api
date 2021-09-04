@@ -14,7 +14,7 @@ import dotenv
 
 dotenv.load_dotenv()
 context = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
-context.load_cert_chain("/home/parliamodipc/ssl/certificate.pem", keyfile="/home/parliamodipc/ssl/private-key.pem")
+context.load_cert_chain("/ssl/certificate.pem", keyfile="/ssl/private-key.pem")
 app = Sanic("api.fasmga")
 app.ctx.webhook = Discord(url = os.getenv("DiscordWebHook"))
 app.ctx.jinja = Environment(loader = FileSystemLoader(searchpath = "./html"))
