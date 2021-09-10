@@ -1,0 +1,9 @@
+# Folder
+**/.vs
+**/.vscode
+**/__pycache__
+
+# Files
+*.pyc
+.env
+**/*json
