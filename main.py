@@ -25,6 +25,11 @@ app.config.update(
   }
 )
 
+if not os.path.exists('./sources/ratelimit.json'):
+	ratelimitjson = open('./sources/ratelimit.json', 'w')
+	ratelimitjson.write("{}")
+	ratelimitjson.close()
+
 #region plug-in handling
 
 if app.config.get("debug"): logger.warning("You are running into developer mode, make sure you don't are using this for run production!")
