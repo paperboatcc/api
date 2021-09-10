@@ -6,10 +6,10 @@ import string
 
 app = Sanic.get_app("api.fasmga")
 
-def render_template(file, **args):
+def render_template(file, returncode, **args):
 	template = app.ctx.jinja.get_template(str(file))
 	htmlPage = template.render(args)
-	return html(htmlPage)
+	return html(htmlPage, status=returncode)
 
 def generateUrlID(idtype):
 	if idtype == "abcdefgh":

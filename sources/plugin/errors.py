@@ -9,10 +9,10 @@ def plug_in():
 	@app.exception(NotFound)
 	async def error_404(request, exception):
 		if request.method == "GET":
-			return render_template("error.html", code = "404", text = "Not found")
+			return render_template("error.html", 404, code = "404", text = "Not found")
 		else:
 			return json({ "error": "Not Found" })
  
 	@app.exception(MethodNotSupported)
 	async def error_405(request, exception): 
-		return json({ "error": f"Method {request.method} not allowed" })
+		return json({ "error": f"Method {request.method} not allowed" }, 405)
