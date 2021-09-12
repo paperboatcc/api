@@ -11,7 +11,7 @@ def ratelimitCheck():
 	def decorator(f):
 		@wraps(f)
 		async def decorated_function(request, *args, **kwargs):
-			client_ip = request.headers.get("X-Forwarded-For")
+			client_ip = request.forwarded.get('for')
 			if not request.form.get("token"): 
 				return json({ "bad_request": "You must do a request with token value!" }, 400)
 			userData = await app.ctx.db.users.find_one({ "api_token": request.form.get("token") })
@@ -80,7 +80,7 @@ def internalRoute():
 	def decorator(f):
 		@wraps(f)
 		async def decorated_function(request, *args, **kwargs):
-			client_ip = request.headers.get("X-Forwarded-For")
+			client_ip = request.forwarded.get('for')
 			userData = await app.ctx.db.users.find_one({ "api_token": request.form.get("token") })
 			if not userData:
 				return json({ "bad_request": "Token you provvided is invalid" }, 400)
