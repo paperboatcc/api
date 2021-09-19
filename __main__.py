@@ -20,16 +20,11 @@ app = Sanic("api.fasmga")
 app.ctx.argv = sys.argv[:]
 app.ctx.webhook = Discord(url = os.getenv("DiscordWebHook"))
 app.ctx.jinja = Environment(loader = FileSystemLoader(searchpath = "./html"))
-app.config.update(
-	{
-		"debug": os.getenv("developer") == "true",
-		"vpsDebug": os.getenv("developer") == "true" and platform.system() == "Linux"
-		"FORWARDED_SECRET" = "Z4hdtUXJYwj9ZMRIu7eX"
-	}
-)
+app.FORWARDED_SECRET = "Z4hdtUXJYwj9ZMRIu7eX"
+app.config.update({ "debug": os.getenv("developer") == "true", "vpsDebug": os.getenv("developer") == "true" and platform.system() == "Linux" })
 
-if not os.path.exists('./sources/ratelimit.json'):
-	ratelimitjson = open('./sources/ratelimit.json', 'w')
+if not os.path.exists('/home/parliamodipc/api/sources/ratelimit.json'):
+	ratelimitjson = open('/home/parliamodipc/api/sources/ratelimit.json', 'w')
 	ratelimitjson.write("{}")
 	ratelimitjson.close()
 
@@ -53,7 +48,7 @@ for filename in [os.path.basename(f)[:-3] for f in glob.glob(os.path.join(os.pat
 logger.info("Done!")
 
 #endregion
-#region Motor Setup
+#region Motor Setup test
 
 @app.listener("before_server_start")
 def setupMotor(app, loop):
@@ -71,7 +66,7 @@ def closingMotor(app, loop):
 
 async def ratelimitReset():
 	while True:
-		jsonFile = open("sources/ratelimit.json", 'r')
+		jsonFile = open("/home/parliamodipc/api/ratelimit.json", 'r')
 		jsonValues = json.load(jsonFile)
 		jsonFile.close()
 		for jsonValue in jsonValues:
@@ -80,7 +75,7 @@ async def ratelimitReset():
 					jsonValues[jsonValue][ip] = 0
 			else:
 				jsonValues[jsonValue] = 0
-		jsonFile = open("sources/ratelimit.json", 'w')
+		jsonFile = open("/home/parliamodipc/api/ratelimit.json", 'w')
 		json.dump(jsonValues, jsonFile, indent = 2, sort_keys = True)
 		jsonFile.close()
 		await asyncio.sleep(60)
@@ -104,8 +99,8 @@ def closing_tasks(app, loop):
 
 if __name__ == "__main__":
 	if app.config.get("vpsDebug"):
-	  app.run(host= "0.0.0.0", port = 2002, debug = True, auto_reload = False, ssl = context)
+		app.run(host= "0.0.0.0", port = 2002, debug = True, auto_reload = False, ssl = context)
 	elif app.config.get("debug"):
-	  app.run(debug = True, auto_reload = False)
+		app.run(debug = True, auto_reload = False)
 	else:
-	  app.run(host = "0.0.0.0", port = 2002, ssl = context)
+		app.run(host = "0.0.0.0", port = 2002, ssl = context)
