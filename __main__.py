@@ -1,4 +1,5 @@
-from sanic import Sanic
+from sanic import Sanic, response
+import sanic
 from sanic.log import logger
 from jinja2 import FileSystemLoader, Environment
 from motor import motor_asyncio as motor
@@ -14,19 +15,27 @@ import ssl
 import sys
 
 dotenv.load_dotenv()
-context = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
-context.load_cert_chain("/ssl/certificate.pem", keyfile="/ssl/private-key.pem")
+
+SSLcontext = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
+SSLcontext.load_cert_chain("/ssl/certificate.pem", keyfile="/ssl/private-key.pem")
+
+#region Register sanic apps
+
 app = Sanic("api.fasmga")
 app.ctx.argv = sys.argv[:]
 app.ctx.webhook = Discord(url = os.getenv("DiscordWebHook"))
 app.ctx.jinja = Environment(loader = FileSystemLoader(searchpath = "./html"))
 app.FORWARDED_SECRET = "Z4hdtUXJYwj9ZMRIu7eX"
-app.config.update(
-  {
-   "debug": os.getenv("developer") == "true",
-	 "vpsDebug": os.getenv("developer") == "true" and platform.system() == "Linux"
-  }
-)
+app.config.update({
+	"SERVER_NAME": "0.0.0.0",
+	"debug": os.getenv("developer") == "true",
+	"vpsDebug": os.getenv("developer") == "true" and platform.system() == "Linux"
+})
+
+http = Sanic("http")
+http.config.SERVER_NAME = "api.fasmga.org"
+
+#endregion
 
 if not os.path.exists('./sources/ratelimit.json'):
 	ratelimitjson = open('./sources/ratelimit.json', 'w')
@@ -53,13 +62,47 @@ for filename in [os.path.basename(f)[:-3] for f in glob.glob(os.path.join(os.pat
 logger.info("Done!")
 
 #endregion
+
+#region http redirect
+
+@http.route("/<path:path>")
+def proxy(request, path):
+	url = request.app.url_for(
+		"proxy",
+		path=path,
+		_server=http.config.SERVER_NAME,
+		_external=True,
+		_scheme="http",
+	)
+	return response.redirect(url, status = 301)
+
+@app.before_server_start
+async def start(app, loop):
+    global http
+    app.http_server = await http.create_server(
+        port=2005, return_asyncio_server=True
+    )
+    app.http_server.after_start()
+
+
+@app.before_server_stop
+async def stop(app, loop):
+    app.http_server.before_stop()
+    await app.http_server.close()
+    app.http_server.after_stop()
+
+#endregion
+
 #region Motor Setup
 
 @app.listener("before_server_start")
 def setupMotor(app, loop):
 	logger.info("Opening motor connection to database")
-	app.ctx.database = motor.AsyncIOMotorClient(os.getenv("MongoDB"), io_loop = loop, tls = False)
-	app.ctx.db = app.ctx.database.fasmga
+	try:
+		app.ctx.database = motor.AsyncIOMotorClient(os.getenv("MongoDB"), io_loop = loop, tls = False)
+		app.ctx.db = app.ctx.database.fasmga
+	except Exception as err:
+		logger.error(f"Cannot connect to database, {err}")
 
 @app.listener("before_server_stop")
 def closingMotor(app, loop):
@@ -67,6 +110,7 @@ def closingMotor(app, loop):
 	app.ctx.database.close()
 
 #endregion
+
 #region Ratelimit handling
 
 async def ratelimitReset():
@@ -103,9 +147,4 @@ def closing_tasks(app, loop):
 #endregion
 
 if __name__ == "__main__":
-	if app.config.get("vpsDebug"):
-	  app.run(host= "0.0.0.0", port = 2002, debug = True, auto_reload = False, ssl = context)
-	elif app.config.get("debug"):
-	  app.run(debug = True, auto_reload = False)
-	else:
-	  app.run(host = "0.0.0.0", port = 2002, ssl = context)
+	app.run(host = "0.0.0.0", port = 2002, ssl = SSLcontext, debug = app.config.debug, auto_reload = app.config.debug)
