@@ -41,13 +41,14 @@ def ratelimitCheck():
 					jsonModule.dump(jsonValue, jsonw, indent = 2, sort_keys = True)
 					jsonw.close()
 					if (jsonValue['anonymous'][client_ip] >= 50):
-						if (jsonValue['anonymous'][client_ip] == 50):
-							app.ctx.webhook.post(content = f"⚠️ | Warning, {client_ip} done 50 request in less than a minute") 
+						if (jsonValue['anonymous'][client_ip] == 50): app.ctx.webhook.post(content = f"⚠️ | Warning, {client_ip} done 50 request in less than a minute") 
 						if (jsonValue['anonymous'][client_ip] == 100):
-							app.ctx.webhook.post(content = f"ℹ️ | Just for information, I can't ban {client_ip} but he / she did 100 requests in less than a minute")
 							logger.warning(f"{client_ip} e bannato e sta tentando di accedere")
-							return json({ "SOTP": "okey, but now STOP! then i obbligated to ban you, you can try to contact fasmga staff to get unban" }, 401)
+							app.ctx.webhook.post(content = f"ℹ️ | Just for information, I can't ban {client_ip} but he / she did 100 requests in less than a minute")
+						if (jsonValue['anonymous'][client_ip] >= 100): 
+							return json({ "SOTP": "okey, but now STOP!" }, 401) #TODO: find a way to ban anonymous ip(s)
 						return json({ "ddos": "Are you trying to DDoS our API? Asking for a friend :)" }, 429)
+					if (jsonValue['anonymous'][client_ip] == 20): app.ctx.webhook.post(content = f"ℹ️ | {client_ip} has ben ratelimited")
 					return json({ "ratelimit": "You did >20 requests to the API in this minute. Wait a minute and try again." }, 429)
 			else:
 				if not user in jsonValue: jsonValue[user] = 0
@@ -64,14 +65,16 @@ def ratelimitCheck():
 					jsonModule.dump(jsonValue, jsonw, indent = 2, sort_keys = True)
 					jsonw.close()
 					if (jsonValue[user] >= 50):
-						if (jsonValue[user] == 50):
-							app.ctx.webhook.post(content = f"⚠️ | Warning, {user} done 50 request in less than a minute") 
+						if (jsonValue[user] == 50): app.ctx.webhook.post(content = f"⚠️ | Warning, {user} done 50 request in less than a minute") 
 						if (jsonValue[user] == 100):
-							await app.ctx.db.users.find_one_and_update({ "api_token": request.form.get("token") }, { "$set": { "is_banned": True }})
+							logger.warning(f"{user} e bannato e sta tentando di accedere ({client_ip})")
 							app.ctx.webhook.post(content = f"ℹ️ | Just for information, I banned {user} because it did 100 requests in less than a minute")
+						if (jsonValue[user] >= 100):
+							await app.ctx.db.users.find_one_and_update({ "api_token": request.form.get("token") }, { "$set": { "is_banned": True }})
 							logger.warning(f"{user} e bannato e sta tentando di accedere ({client_ip})")
 							return json({ "STOP": "okey, but now SOTP! then i obbligated to ban you, you can try to contact fasmga staff to get unban" }, 401)
 						return json({ "ddos": "Are you trying to DDoS our API? Asking for a friend :)" }, 429)
+					if (jsonValue[user] == 20): app.ctx.webhook.post(content = f"ℹ️ | {user} has ben ratelimited")
 					return json({ "ratelimit": "You did >20 requests to the API in this minute. Wait a minute and try again." }, 429)
 		return decorated_function
 	return decorator
