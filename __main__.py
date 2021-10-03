@@ -1,5 +1,4 @@
-from sanic import Sanic, response
-import sanic
+from sanic import Sanic
 from sanic.log import logger
 from jinja2 import FileSystemLoader, Environment
 from motor import motor_asyncio as motor
@@ -33,8 +32,8 @@ app.config.update({
 
 #endregion
 
-if not os.path.exists('/home/parliamodipc/api/sources/ratelimit.json'):
-	ratelimitjson = open('/home/parliamodipc/api/sources/ratelimit.json', 'w')
+if not os.path.exists('sources/ratelimit.json'):
+	ratelimitjson = open('sources/ratelimit.json', 'w')
 	ratelimitjson.write("{}")
 	ratelimitjson.close()
 
@@ -81,7 +80,7 @@ def closingMotor(app, loop):
 
 async def ratelimitReset():
 	while True:
-		jsonFile = open("/home/parliamodipc/api/ratelimit.json", 'r')
+		jsonFile = open("sources/ratelimit.json", 'r')
 		jsonValues = json.load(jsonFile)
 		jsonFile.close()
 		for jsonValue in jsonValues:
@@ -90,7 +89,7 @@ async def ratelimitReset():
 					jsonValues[jsonValue][ip] = 0
 			else:
 				jsonValues[jsonValue] = 0
-		jsonFile = open("/home/parliamodipc/api/ratelimit.json", 'w')
+		jsonFile = open("sources/ratelimit.json", 'w')
 		json.dump(jsonValues, jsonFile, indent = 2, sort_keys = True)
 		jsonFile.close()
 		await asyncio.sleep(60)

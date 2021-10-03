@@ -22,7 +22,7 @@ def ratelimitCheck():
 				logger.warning(f"{userData['username']} e bannato e sta tentando di accedere ({client_ip})")
 				return json({ "banned": "You are banned from api, you can try to contact fasmga staff to get unban" }, 401)
 
-			jsonFile = open("/home/parliamodipc/api/sources/ratelimit.json", "r")
+			jsonFile = open("sources/ratelimit.json", "r")
 			jsonValue = jsonModule.load(jsonFile)
 			jsonFile.close()
 			if user == 'anonymous':
