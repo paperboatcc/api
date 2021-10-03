@@ -17,8 +17,6 @@ data = {
 	#"login": True
 }
 
-print(data)
-
 async def main():
 	doWhile = "--loop" in sys.argv or "-l" in sys.argv
 	UseSSL = "--useSLL" in sys.argv or "-ssl" in sys.argv 
