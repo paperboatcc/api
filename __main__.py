@@ -27,15 +27,14 @@ app.ctx.webhook = Discord(url = os.getenv("DiscordWebHook"))
 app.ctx.jinja = Environment(loader = FileSystemLoader(searchpath = "./html"))
 app.FORWARDED_SECRET = "Z4hdtUXJYwj9ZMRIu7eX"
 app.config.update({
-	"SERVER_NAME": "0.0.0.0",
 	"debug": os.getenv("developer") == "true",
 	"vpsDebug": os.getenv("developer") == "true" and platform.system() == "Linux"
 })
 
 #endregion
 
-if not os.path.exists('./sources/ratelimit.json'):
-	ratelimitjson = open('./sources/ratelimit.json', 'w')
+if not os.path.exists('/home/parliamodipc/api/sources/ratelimit.json'):
+	ratelimitjson = open('/home/parliamodipc/api/sources/ratelimit.json', 'w')
 	ratelimitjson.write("{}")
 	ratelimitjson.close()
 
@@ -82,7 +81,7 @@ def closingMotor(app, loop):
 
 async def ratelimitReset():
 	while True:
-		jsonFile = open("sources/ratelimit.json", 'r')
+		jsonFile = open("/home/parliamodipc/api/ratelimit.json", 'r')
 		jsonValues = json.load(jsonFile)
 		jsonFile.close()
 		for jsonValue in jsonValues:
@@ -91,7 +90,7 @@ async def ratelimitReset():
 					jsonValues[jsonValue][ip] = 0
 			else:
 				jsonValues[jsonValue] = 0
-		jsonFile = open("sources/ratelimit.json", 'w')
+		jsonFile = open("/home/parliamodipc/api/ratelimit.json", 'w')
 		json.dump(jsonValues, jsonFile, indent = 2, sort_keys = True)
 		jsonFile.close()
 		await asyncio.sleep(60)
