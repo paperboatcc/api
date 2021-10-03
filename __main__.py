@@ -32,9 +32,6 @@ app.config.update({
 	"vpsDebug": os.getenv("developer") == "true" and platform.system() == "Linux"
 })
 
-http = Sanic("http")
-http.config.SERVER_NAME = "api.fasmga.org"
-
 #endregion
 
 if not os.path.exists('./sources/ratelimit.json'):
@@ -60,36 +57,6 @@ for filename in [os.path.basename(f)[:-3] for f in glob.glob(os.path.join(os.pat
 		logger.info(f"{filename} loaded successfully!")
 	logger.info("-------------------------------------------------------")
 logger.info("Done!")
-
-#endregion
-
-#region http redirect
-
-@http.route("/<path:path>")
-def proxy(request, path):
-	url = request.app.url_for(
-		"proxy",
-		path=path,
-		_server=http.config.SERVER_NAME,
-		_external=True,
-		_scheme="http",
-	)
-	return response.redirect(url, status = 301)
-
-@app.before_server_start
-async def start(app, loop):
-    global http
-    app.http_server = await http.create_server(
-        port=2005, return_asyncio_server=True
-    )
-    app.http_server.after_start()
-
-
-@app.before_server_stop
-async def stop(app, loop):
-    app.http_server.before_stop()
-    await app.http_server.close()
-    app.http_server.after_stop()
 
 #endregion
 
