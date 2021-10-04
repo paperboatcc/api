@@ -14,5 +14,6 @@ def plug_in():
 			return json({ "error": "Not Found" })
  
 	@app.exception(MethodNotSupported)
-	async def error_405(request, exception): 
+	async def error_405(request, exception):
 		return json({ "error": f"Method {request.method} not allowed" }, 405)
+
