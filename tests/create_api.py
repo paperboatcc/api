@@ -6,7 +6,7 @@ import sys
 
 dotenv.load_dotenv()
 
-url = "https://fasmvps.ga:2002/create"
+url = "http://fasmvps.ga:2002/create"
 data = {
 	"token": os.environ.get("TOKEN"),
 	"id": "xaydzajb",

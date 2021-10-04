@@ -6,7 +6,7 @@ import sys
 
 dotenv.load_dotenv()
 
-url = "https://fasmvps.ga:2002/delete"
+url = "http://fasmvps.ga:2002/delete"
 data = {
 	"token": os.environ.get("TOKEN"),
 	"id": ""
