@@ -15,9 +15,6 @@ import sys
 
 dotenv.load_dotenv()
 
-SSLcontext = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
-SSLcontext.load_cert_chain("/ssl/certificate.pem", keyfile="/ssl/private-key.pem")
-
 #region Register sanic apps
 
 app = Sanic("api.fasmga")
@@ -112,4 +109,4 @@ def closing_tasks(app, loop):
 #endregion
 
 if __name__ == "__main__":
-	app.run(host = "0.0.0.0", port = 2002, ssl = SSLcontext, debug = app.config.debug, auto_reload = app.config.debug)
+	app.run(host = "0.0.0.0", port = 2002, debug = app.config.debug, auto_reload = app.config.debug)
