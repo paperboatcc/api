@@ -76,7 +76,8 @@ def plug_in():
 				"clicks": 0,
 				"captcha": False,
 				"deletedate": 0,
-				"editinfo": {}
+				"editinfo": {},
+				"unembedify": False
 			}
 		)
    
