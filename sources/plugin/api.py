@@ -12,7 +12,7 @@ def plug_in():
 	@app.post("/ratelimit")
 	@ratelimitCheck()
 	async def _ratelimit(request):
-		return json({ "authorized": True, "message": "You can continue to use fasmga!" })
+		return json({ "authorized": True, "message": "You can use fasmga!" })
 
 	@app.post("/create")
 	@ratelimitCheck()
@@ -27,10 +27,10 @@ def plug_in():
 		if nsfw == 1: nsfw = True
 		else: nsfw = False
 		blacklist = await app.ctx.db.config.find_one({ "type": "blacklist" })
-		if request.form.get("url") in blacklist["blacklist"]: return json({ "error": 'Value "url" contains an url blacklisted' }, 403)
+		if request.form.get("url") in blacklist["blacklist"]: return json({ "error": 'The URL you inserted as value in "url" is blacklisted.' }, 403)
 		if request.form.get("id"):
 			urlID = request.form.get("id")
-			if len(urlID) > 30: return json({ "error": "This ID is too long (>30)" }, 400)
+			if len(urlID) > 30: return json({ "error": "The ID you provided is too long (>30)" }, 400)
 			if any(bad_character in urlID for bad_character in ["?", "#", "/", "\\", "<", ">"]): return json({ "error": "This ID contains a prohibited character (?, #, \\, <, >" }, 400)
 			if (await app.ctx.db.urls.find_one({ "ID": urlID })): return json({ "error": "An url with this ID alredy exist" }, 403)
 		else:
@@ -69,7 +69,7 @@ def plug_in():
 		urlDocument =  await app.ctx.db.urls.find_one({ "ID": request.form.get("id") })
 		if not urlDocument: return json({ "error": 'Value "id" is invalid' }, 400)
 		userDocument = await app.ctx.db.users.find_one({ "api_token": request.form.get("token") })
-		if not userDocument["username"] == urlDocument["owner"]: return json({ "error": "This url is not your" }, 403)
+		if not userDocument["username"] == urlDocument["owner"]: return json({ "error": "This url is not yours" }, 403)
 		if request.form.get("password"): password = hashlib.sha512((request.form.get("password")).encode()).hexdigest() #TODO: Change ""encrypt"" method
 		else: password = ""
 		if nsfw == None: nsfw = urlDocument["nsfw"]
@@ -102,7 +102,7 @@ def plug_in():
 		urlDocument =  await app.ctx.db.urls.find_one({ "ID": request.form.get("id") })
 		if not urlDocument: return json({ "error": 'Value "id" is invalid' }, 400)
 		userDocument = await app.ctx.db.users.find_one({ "api_token": request.form.get("token") })
-		if not userDocument["username"] == urlDocument["owner"]: return json({ "error": "This url is not your" }, 403)
+		if not userDocument["username"] == urlDocument["owner"]: return json({ "error": "This url is not yours" }, 403)
 		await app.ctx.db.urls.find_one_and_delete({ "ID": request.form.get("id") })
 		return json({ "success": "success" })
 
