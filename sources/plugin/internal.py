@@ -53,7 +53,10 @@ def plug_in():
 					"owner": userData["username"],
 					"password": password,
 					"nsfw": nsfw,
-				"clicks": 0
+					"clicks": 0,
+				"captcha": False,
+				"deletedate": 0,
+				"editinfo": {}
 				}
 			)
 		else:
@@ -64,7 +67,10 @@ def plug_in():
 					"owner": "anonymous",
 					"password": password,
 					"nsfw": nsfw,
-				"clicks": 0
+				"clicks": 0,
+				"captcha": False,
+				"deletedate": 0,
+				"editinfo": {}
 				}
 			)
    
