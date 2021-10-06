@@ -1,6 +1,6 @@
 from sanic import Sanic
 from sanic.response import json
-from sources.decorators import internalRoute, ratelimitCheck
+from sources.decorators import internalRouteLegacy, ratelimitCheckLegacy
 from sources.utities import generateUrlID
 import validators
 import distutils.util
@@ -10,8 +10,8 @@ def plug_in():
 	app = Sanic.get_app("api.fasmga")
 
 	@app.post("/internal/create")
-	@ratelimitCheck()
-	@internalRoute()
+	@ratelimitCheckLegacy()
+	@internalRouteLegacy()
 	async def internal_create(request):
 		try: login = distutils.util.strtobool(request.form.get("login").lower())
 		except: return json({ "error": 'Value "login" is invalid' }, 400)
@@ -77,8 +77,8 @@ def plug_in():
 		return json({ "success": f"/{urlID}" })
 
 	@app.post("/internal/edit")
-	@ratelimitCheck()
-	@internalRoute()
+	@ratelimitCheckLegacy()
+	@internalRouteLegacy()
 	async def internal_edit(request):
 		try: login = distutils.util.strtobool(request.form.get("login").lower())
 		except: return json({ "error": 'Value "login" is invalid' }, 400)
@@ -114,8 +114,8 @@ def plug_in():
 		return json({ "success": "success" })
  
 	@app.post("/internal/list")
-	@ratelimitCheck()
-	@internalRoute()
+	@ratelimitCheckLegacy()
+	@internalRouteLegacy()
 	async def internal_list(request):
 		try: login = distutils.util.strtobool(request.form.get("login").lower())
 		except: return json({ "error": 'Value "login" is invalid' }, 400)
@@ -131,8 +131,8 @@ def plug_in():
 		return json(userUrls)
 
 	@app.post("/internal/delete")
-	@ratelimitCheck()
-	@internalRoute()
+	@ratelimitCheckLegacy()
+	@internalRouteLegacy()
 	async def internal_delete(request):
 		try: login = distutils.util.strtobool(request.form.get("login").lower())
 		except: return json({ "error": 'Value "login" is invalid' }, 400)

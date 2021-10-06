@@ -1,7 +1,8 @@
-from sanic import Sanic
+from sanic import Sanic, Request
 from sanic.response import json
-from sources.decorators import ratelimitCheck
+from sources.decorators import ratelimitCheckLegacy, ratelimitCheck
 from sources.utities import generateUrlID
+import json as jsonModule
 import distutils.util
 import hashlib
 import validators
@@ -9,13 +10,38 @@ import validators
 def plug_in():
 	app = Sanic.get_app("api.fasmga")
 
-	@app.post("/ratelimit")
-	@ratelimitCheck()
+	@app.get("/ratelimit")
 	async def _ratelimit(request):
-		return json({ "authorized": True, "message": "You can use fasmga!" })
+		userData = await app.ctx.db.users.find_one({ "api_token": request.headers.get("Authorization") })
+		if not userData: return json({ "bad_request": "Token you provvided is invalid" }, 400)
+
+		ratelimitJsonF = open("sources/ratelimit.json", "r")
+		ratelimitJson = jsonModule.loads(ratelimitJsonF.read())
+		ratelimitJsonF.close()
+
+		current = 0
+
+		if not userData["username"] in ratelimitJson: current = 0
+		else: current = ratelimitJson[userData["username"]]
+
+		return json({ "message": "You can use fasmga!" if current < 20 else "You are ratelimited", "remain": 20 - current if 20 - current >= 0 else 0 }, 200 if 20 - current >= 0 else 429)
+
+	@app.get("/user")
+	@ratelimitCheck()
+	async def user_data(request):
+		userData = await app.ctx.db.users.find_one({ "api_token": request.headers.get("Authorization") })
+		if not userData: return json({ "bad_request": "Token you provvided is invalid" }, 400)
+
+		del userData["_id"]
+		del userData["password"]
+		del userData["login_token"]
+		del userData["api_token"]
+		del userData["totp"]
+
+		return json(userData)
 
 	@app.post("/create")
-	@ratelimitCheck()
+	@ratelimitCheckLegacy()
 	async def api_create(request):
 		if not request.form.get("url"): return json({ "error": 'Missing "url" value into the request' }, 400)
 		if not request.form.get("idtype"): return json({ "error": 'Missing "idtype" value into the request' }, 400)
@@ -57,7 +83,7 @@ def plug_in():
 		return json({ "success": f"/{urlID}" })
 
 	@app.post("/edit")
-	@ratelimitCheck()
+	@ratelimitCheckLegacy()
 	async def api_edit(request):
 		if not request.form.get("id"): return json({ "error": 'Missing "id" value into the request' }, 400)
 		if not (request.form.get("id") or request.form.get("password") or request.form.get("nsfw")): return json({ "error": 'Missing "url" or "password" or "nsfw" value(s) into the request' }, 400)
@@ -88,7 +114,7 @@ def plug_in():
 		return json({ "success": "success" })
  
 	@app.post("/list")
-	@ratelimitCheck()
+	@ratelimitCheckLegacy()
 	async def api_list(request):
 		userData = await app.ctx.db.users.find_one({ "api_token": request.form.get("token") })
 		userUrls = []
@@ -99,7 +125,7 @@ def plug_in():
 		return json(userUrls)
 
 	@app.post("/delete")
-	@ratelimitCheck()
+	@ratelimitCheckLegacy()
 	async def api_delete(request):
 		if not request.form.get("id"): return json({ "error": 'Missing "id" value into the request' }, 400)
 		urlDocument =  await app.ctx.db.urls.find_one({ "ID": request.form.get("id") })

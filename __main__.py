@@ -9,8 +9,6 @@ import glob
 import importlib
 import json
 import os
-import platform
-import ssl
 import sys
 
 dotenv.load_dotenv()
@@ -23,8 +21,7 @@ app.ctx.webhook = Discord(url = os.getenv("DiscordWebHook"))
 app.ctx.jinja = Environment(loader = FileSystemLoader(searchpath = "./html"))
 app.FORWARDED_SECRET = "Z4hdtUXJYwj9ZMRIu7eX"
 app.config.update({
-	"debug": os.getenv("developer") == "true",
-	"vpsDebug": os.getenv("developer") == "true" and platform.system() == "Linux"
+	"debug": os.getenv("developer") == "true"
 })
 
 #endregion
@@ -107,6 +104,8 @@ def closing_tasks(app, loop):
 
 
 #endregion
+
+__spec__ = ""
 
 if __name__ == "__main__":
 	app.run(host = "0.0.0.0", port = 2002, debug = app.config.debug, auto_reload = app.config.debug)
