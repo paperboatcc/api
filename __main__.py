@@ -21,7 +21,8 @@ app.ctx.webhook = Discord(url = os.getenv("DiscordWebHook"))
 app.ctx.jinja = Environment(loader = FileSystemLoader(searchpath = "./html"))
 app.FORWARDED_SECRET = "Z4hdtUXJYwj9ZMRIu7eX"
 app.config.update({
-	"debug": os.getenv("developer") == "true"
+	"debug": os.environ.get("debug") == "true",
+	"verbose": os.environ.get("verbose") == "true"
 })
 
 #endregion
@@ -108,4 +109,4 @@ def closing_tasks(app, loop):
 __spec__ = ""
 
 if __name__ == "__main__":
-	app.run(host = "0.0.0.0", port = 2002, debug = app.config.debug, auto_reload = app.config.debug)
+	app.run(host = "0.0.0.0", port = 2002, debug = app.config.verbose, auto_reload = app.config.debug)

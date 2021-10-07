@@ -11,7 +11,7 @@ def plug_in():
 		if request.method == "GET":
 			return render_template("error.html", 404, code = "404", text = "Not found")
 		else:
-			return json({ "error": "Not Found" })
+			return json({ "error": "This page doesn't exist" }, 404)
  
 	@app.exception(MethodNotSupported)
 	async def error_405(request, exception):

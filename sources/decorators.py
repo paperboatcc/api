@@ -1,5 +1,6 @@
 from functools import wraps
-from sanic import Sanic
+import traceback
+from sanic import Request, Sanic
 from sanic.response import json
 from sanic.log import logger
 from sources.utities import tempBanRemove
@@ -10,7 +11,7 @@ app = Sanic.get_app("api.fasmga")
 def ratelimitCheckLegacy():
 	def decorator(f):
 		@wraps(f)
-		async def decorated_function(request, *args, **kwargs):
+		async def decorated_function(request: Request, *args, **kwargs):
 			client_ip = request.forwarded.get('for')
 			if not request.form.get("token"): 
 				return json({ "bad_request": "You must do a request with token value!" }, 400)
@@ -82,7 +83,7 @@ def ratelimitCheckLegacy():
 def ratelimitCheck():
 	def decorator(f):
 		@wraps(f)
-		async def decorated_function(request, *args, **kwargs):
+		async def decorated_function(request: Request, *args, **kwargs):
 			if not request.headers.get("Authorization"): return json({ "bad_request": "You must do a request with Authorization header!" }, 400)
 			userData = await app.ctx.db.users.find_one({ "api_token": request.headers.get("Authorization") })
 			if not userData: return json({ "bad_request": "Token you provvided is invalid" }, 400)
@@ -157,7 +158,7 @@ def ratelimitCheck():
 def internalRouteLegacy():
 	def decorator(f):
 		@wraps(f)
-		async def decorated_function(request, *args, **kwargs):
+		async def decorated_function(request: Request, *args, **kwargs):
 			client_ip = request.forwarded.get('for')
 			userData = await app.ctx.db.users.find_one({ "api_token": request.form.get("token") })
 			if not userData:
@@ -180,7 +181,7 @@ def internalRouteLegacy():
 def internalRoute():
 	def decorator(f):
 		@wraps(f)
-		async def decorated_function(request, *args, **kwargs):
+		async def decorated_function(request: Request, *args, **kwargs):
 			if not request.headers.get("Authorization"): return json({ "bad_request": "You must do a request with Authorization header!" }, 400)
 			userData = await app.ctx.db.users.find_one({ "api_token": request.headers.get("Authorization") })
 			if not userData: return json({ "bad_request": "Token you provvided is invalid" }, 400)
@@ -201,4 +202,49 @@ def internalRoute():
 
 		return decorated_function
 
+	return decorator
+
+def argsCheck(values: list = [], expected_type: list = []):
+	def decorator(f):
+		@wraps(f)
+		async def decorated_function(request: Request, *args, **kwargs):
+			if values == []:
+				try:
+					raise Exception("You want to check a list of 0 values? \N{neutral face}")
+				except Exception:
+					traceback.print_exc()
+					return json({ "teapot": "Did you want some tea?", "error": "There is an 500 status code in the server, but i want to ask you if you want some tea" }, 418)
+			requestData = request.json
+			if not requestData:
+				requestData = {}
+			types = not expected_type == [] and len(values) == len(expected_type)
+
+			missing = []
+
+			for value in values:
+				if not value in requestData:
+					_list = [value]
+					if types:
+						_list.append(expected_type[values.index(value)])
+					missing.append(_list)
+
+			response = { "error": f"Missing value{'s are' if len(missing) > 1 else ' is'} " }
+
+			for missingValue in missing:
+				response["error"] += f"{missingValue[0]}{', ' if not len(missing) - 1 == missing.index(missingValue) else '.'}"
+
+			if types:
+				response["types"] = ""
+				for missingValue in missing:
+					if missingValue[1].__class__.__name__ == "str":
+						response["types"] += f"{missingValue[0]} is a {missingValue[1]}{'; ' if not missing[-1] == missing[missing.index(missingValue)] else '.'}"
+					else:
+						response["types"] += f"{missingValue[0]} is a {missingValue[1].__name__}{'; ' if not missing[-1] == missing[missing.index(missingValue)] else '.'}"
+
+			if len(missing) > 0:
+				return json(response, 400)
+
+			return await f(request, *args, **kwargs)
+
+		return decorated_function
 	return decorator
