@@ -81,3 +81,42 @@ def plug_in():
 		)
    
 		return json({ "success": f"/{urlID}" })
+
+	@app.get("/testing/get")
+	@ratelimitCheck()
+	async def get_api(request: Request):
+		userData = await app.ctx.db.users.find_one({ "api_token": request.headers.get("Authorization") })
+		userUrls = []
+		async for urlDocument in app.ctx.db.urls.find({ "owner": userData["username"] }):
+			del urlDocument["_id"]
+			del urlDocument["password"]
+
+			userUrls.append(urlDocument)
+
+		return json(userUrls)
+
+	@app.delete("/testing/delete")
+	#@argsCheck(["id"], ["id of the url to delete"])
+	@ratelimitCheck()
+	async def delete_api(request: Request):
+		if not request.args.get("id"): return json({ "error": "Missing value is url", "type": "id is the id of the url to delete (PS. on args, not on body!)" }, 400)
+		urlDocument =  await app.ctx.db.urls.find_one({ "ID": request.args.get("id") })
+		if not urlDocument: return json({ "error": 'Value "id" is invalid' }, 400)
+
+		userDocument = await app.ctx.db.users.find_one({ "api_token": request.headers.get("Authorization") })
+		if not userDocument["username"] == urlDocument["owner"]: return json({ "error": "This url is not yours" }, 403)
+
+		await app.ctx.db.urls.find_one_and_delete({ "ID": request.args.get("id") })
+
+		return json({ "success": "success" })
+
+
+"""
+		if not request.form.get("id"): return json({ "error": 'Missing "id" value into the request' }, 400)
+		urlDocument =  await app.ctx.db.urls.find_one({ "ID": request.form.get("id") })
+		if not urlDocument: return json({ "error": 'Value "id" is invalid' }, 400)
+		userDocument = await app.ctx.db.users.find_one({ "api_token": request.form.get("token") })
+		if not userDocument["username"] == urlDocument["owner"]: return json({ "error": "This url is not yours" }, 403)
+		await app.ctx.db.urls.find_one_and_delete({ "ID": request.form.get("id") })
+		return json({ "success": "success" })
+"""

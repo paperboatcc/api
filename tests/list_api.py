@@ -6,7 +6,7 @@ import sys
 
 dotenv.load_dotenv()
 
-url = "https//fasmvps.ga:2002/list"
+url = "http://fasmvps.ga:2002/list"
 data = {
 	"token": os.environ.get("TOKEN"),
 }
@@ -20,9 +20,6 @@ async def module() -> list:
 # Se il file e runnato direttamente ad python
 async def main():
 	UseSSL = "--useSLL" in sys.argv or "-ssl" in sys.argv 
-
-	del data["id"]
-	del data["login"]
 
 	await do_request(url, data, UseSSL)
 

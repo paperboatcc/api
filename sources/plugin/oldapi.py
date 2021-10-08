@@ -90,6 +90,7 @@ def plug_in():
 		userUrls = []
 		async for urlDocument in app.ctx.db.urls.find({ "owner": userData["username"] }):
 			del urlDocument["_id"]
+
 			userUrls.append(urlDocument)
 
 		return json(userUrls)
