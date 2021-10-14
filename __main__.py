@@ -19,10 +19,10 @@ app = Sanic("api.fasmga")
 app.ctx.argv = sys.argv[:]
 app.ctx.webhook = Discord(url = os.getenv("DiscordWebHook"))
 app.ctx.jinja = Environment(loader = FileSystemLoader(searchpath = "./html"))
-app.FORWARDED_SECRET = "Z4hdtUXJYwj9ZMRIu7eX"
 app.config.update({
 	"debug": os.environ.get("debug") == "true",
-	"verbose": os.environ.get("verbose") == "true"
+	"verbose": os.environ.get("verbose") == "true",
+	"FORWARDED_SECRET": os.environ.get("FORWARDED_SECRET"),
 })
 
 #endregion

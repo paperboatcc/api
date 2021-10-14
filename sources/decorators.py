@@ -204,7 +204,7 @@ def internalRoute():
 
 	return decorator
 
-def argsCheck(values: list = [], expected_type: list = []):
+def argsCheck(mode = "required", values: list = [], expected_type: list = []):
 	def decorator(f):
 		@wraps(f)
 		async def decorated_function(request: Request, *args, **kwargs):
@@ -228,7 +228,8 @@ def argsCheck(values: list = [], expected_type: list = []):
 						_list.append(expected_type[values.index(value)])
 					missing.append(_list)
 
-			response = { "error": f"Missing value{'s are' if len(missing) > 1 else ' is'} " }
+			x = 's are' if len(missing) > 1 else ' is'
+			response = { "error": f"{f'Missing value{x}' if mode == 'required' else f'Missing at least one of the value:'} " }
 
 			for missingValue in missing:
 				response["error"] += f"{missingValue[0]}{', ' if not len(missing) - 1 == missing.index(missingValue) else '.'}"
@@ -241,7 +242,9 @@ def argsCheck(values: list = [], expected_type: list = []):
 					else:
 						response["types"] += f"{missingValue[0]} is a {missingValue[1].__name__}{'; ' if not missing[-1] == missing[missing.index(missingValue)] else '.'}"
 
-			if len(missing) > 0:
+			if len(missing) > 0 and mode == "required":
+				return json(response, 400)
+			elif len(missing) == len(values) and mode == "optional":
 				return json(response, 400)
 
 			return await f(request, *args, **kwargs)
