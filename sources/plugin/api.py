@@ -1,4 +1,3 @@
-from xxlimited import Str
 from sanic import Sanic, Request
 from sanic.response import json
 from sources.decorators import argsCheck, ratelimitCheck
