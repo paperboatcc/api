@@ -5,6 +5,7 @@ from sources.utities import generateUrlID
 import json as jsonModule
 import hashlib
 import validators
+import pyotp
 
 def plug_in():
 	app = Sanic.get_app("api.fasmga")
@@ -80,7 +81,9 @@ def plug_in():
 				"captcha": False,
 				"deletedate": 0,
 				"editinfo": {},
-				"unembedify": False
+				"unembedify": False,
+				"securitytype": password if not password == "" else "none" # provabilmente non serviva ma adesso non ho tempo di provare 
+				"securitytotp": pyotp.random_base32(),
 			}
 		)
    
