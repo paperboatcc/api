@@ -85,7 +85,7 @@ def plug_in():
 				"deletedate": 0,
 				"editinfo": {},
 				"unembedify": False,
-				"securitytype": password if not password == "" else "none" # provabilmente non serviva ma adesso non ho tempo di provare 
+				"securitytype": password if not password == "" else "none", # provabilmente non serviva ma adesso non ho tempo di provare 
 				"securitytotp": pyotp.random_base32(),
 				"qruuid1": uuid.uuid4(),
 				"qruuid2": uuid.uuid4(),
