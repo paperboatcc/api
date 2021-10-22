@@ -52,8 +52,8 @@ def plug_in():
 				"unembedify": False,
 				"securitytype": password if not password == "" else "none", # provabilmente non serviva ma adesso non ho tempo di provare 
 				"securitytotp": pyotp.random_base32(),
-				"qruuid1": uuid.uuid4(),
-				"qruuid2": uuid.uuid4(),
+				"qruuid1": uuid.uuid4().__str__(),
+				"qruuid2": uuid.uuid4().__str__(),
 				"creationdate": int(time.time())
 			}
 		)
@@ -98,6 +98,7 @@ def plug_in():
 		userUrls = []
 		async for urlDocument in app.ctx.db.urls.find({ "owner": userData["username"] }):
 			del urlDocument["_id"]
+			print(urlDocument)
 
 			userUrls.append(urlDocument)
 
