@@ -8,6 +8,7 @@ import hashlib
 import validators
 import pyotp
 import uuid
+import time
 
 def plug_in():
 	app = Sanic.get_app("api.fasmga")
@@ -86,8 +87,9 @@ def plug_in():
 				"unembedify": False,
 				"securitytype": password if not password == "" else "none" # provabilmente non serviva ma adesso non ho tempo di provare 
 				"securitytotp": pyotp.random_base32(),
-				"qruuid1": uuid.uuid4()
-				"qruuid2": uuid.uuid4()
+				"qruuid1": uuid.uuid4(),
+				"qruuid2": uuid.uuid4(),
+				"creationdate": int(time.time())
 			}
 		)
    
