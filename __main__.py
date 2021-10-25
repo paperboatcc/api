@@ -13,7 +13,7 @@ import sys
 
 dotenv.load_dotenv()
 
-#region Register sanic apps
+#region Register sanic app
 
 app = Sanic("api.fasmga")
 app.ctx.argv = sys.argv[:]
@@ -35,13 +35,12 @@ if not os.path.exists('sources/ratelimit.json'):
 #region plug-in handling
 
 if app.config.get("debug"): logger.warning("You are running into developer mode, make sure you don't are using this for run production!")
-logger.info(f"Discorvering plug-in for {app.name}!")
+logger.info(f"Discovering plug-in for {app.name}!")
 logger.info("-------------------------------------------------------")
 for filename in [os.path.basename(f)[:-3] for f in glob.glob(os.path.join(os.path.dirname("./sources/plugin/"), "*.py")) if os.path.isfile(f)]:
-	module = importlib.import_module(f"sources.plugin.{filename}")
 	logger.info(f"Loading {filename}...")
 	try:
-		module.plug_in()
+		importlib.import_module(f"sources.plugin.{filename}")
 	except Exception as error:
 		logger.error(f"Error loading {filename}")
 		if app.config.get("debug"): logger.error(error)
@@ -66,7 +65,7 @@ def setupMotor(app, loop):
 
 @app.listener("before_server_stop")
 def closingMotor(app, loop):
-	logger.info("Closing motor conntenction")
+	logger.info("Closing motor connection")
 	app.ctx.database.close()
 
 #endregion

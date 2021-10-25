@@ -21,7 +21,7 @@ async def module() -> list:
 	UseSSL = "--useSLL" in sys.argv or "-ssl" in sys.argv 
 	results = []
 
-	del data["id"] # gli id presettati non possono essere testati, perche dovrei cancellarli subito dopo che li uso
+	del data["id"] # gli id pre-settati non possono essere testati, perche dovrei cancellarli subito dopo che li uso
 	del data["password"]
 	data["nsfw"] = True
 	data["idtype"] = "abcdefgh"
@@ -45,6 +45,7 @@ async def module() -> list:
 
 	data["nsfw"] = False
 	data["idtype"] = "abcdefgh"
+	del data["password"]
 	results.append(await do_request(url, data, UseSSL)) #? no nsfw, no password, idtype abcdefgh
 
 	data["idtype"] = "abc12345"

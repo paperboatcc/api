@@ -10,7 +10,6 @@ import delete_api
 dotenv.load_dotenv()
 
 async def main():
-
 	UrlList = await create_api.module()
 
 	print(f"Il test della creazione degli url ha restituito: {UrlList}")
@@ -31,9 +30,6 @@ async def main():
 	FetchedUrlList2 = await list_api.module()
 
 	print(f"Il test del fetch di tutti gli url del token ha restituito (dopo la cancellazione di quelli creati per il test): {FetchedUrlList2}")
-
-	#TODO: fare l'edit
-
 
 if __name__ == "__main__":
 	loop = asyncio.get_event_loop()
