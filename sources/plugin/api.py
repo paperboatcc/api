@@ -113,6 +113,9 @@ async def _get_api(request: Request):
 	async for urlDocument in app.ctx.db.urls.find({ "owner": userData["username"] }):
 		del urlDocument["_id"]
 		del urlDocument["password"]
+		del urlDocument["qruuid1"]
+		del urlDocument["qruuid2"]
+		del urlDocument["securitytotp"]
 
 		userUrls.append(urlDocument)
 
