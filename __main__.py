@@ -10,10 +10,14 @@ import importlib
 import json
 import os
 import sys
+import ssl
 
 dotenv.load_dotenv()
 
 #region Register sanic app
+
+sllContex = ssl.create_default_context(purpose = ssl.Purpose.CLIENT_AUTH)
+sllContex.load_cert_chain("/ssl/certificate.pem", keyfile = "/ssl/private-key.pem")
 
 app = Sanic("api.fasmga")
 app.ctx.argv = sys.argv[:]
@@ -108,4 +112,4 @@ def closing_tasks(app, loop):
 __spec__ = ""
 
 if __name__ == "__main__":
-	app.run(host = "0.0.0.0", port = 2002, debug = app.config.verbose, auto_reload = app.config.debug)
+	app.run(host = "0.0.0.0", port = 2002, ssl = sllContex, debug = app.config.verbose, auto_reload = app.config.debug)
