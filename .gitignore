@@ -1,9 +1,7 @@
-# Folder
-**/.vs
-**/.vscode
-**/__pycache__
+# IDE Files
+.vs/
+.vscode/
 
-# Files
-*.pyc
-.env
-**/*json
+# dotnet restore / build files
+bin/
+obj/ 
