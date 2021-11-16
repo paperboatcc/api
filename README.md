@@ -20,7 +20,7 @@
 <div align="center">
   This is the repository for <a href="https://www.fasmga.org">Fasm.ga</a> API (<code>Application Programming Interface</code>)
 
-  You don't known what fasm.ga is you can read our <a href="https://github.com/fasm-ga/fasmga/blob/main/README.md">readme</a>
+  You don't known what fasm.ga is? You can read our <a href="https://github.com/fasm-ga/fasmga/blob/main/README.md">readme</a>!
 
   <h1>Licensing</h1>
 
