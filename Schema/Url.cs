@@ -9,12 +9,12 @@ public class Url {
 	public string password { get; set; }
 	public bool nsfw { get; set; }
 	public bool captcha { get; set; }
-	public int click { get; set; }
+	public int clicks { get; set; }
 	public bool unembedify { get; set; }
 	public int deletedate { get; set; }
 	public object editinfo { get; set; }
-	private Guid qruuid1 { get; set; }
-	private Guid qruuid2 { get; set; }
+	public Guid qruuid1 { get; set; }
+	public Guid qruuid2 { get; set; }
 	public string securitytype { get; set; }
 	public string securitytotp { get; set; }
 	public int creationdate { get; }
@@ -32,10 +32,12 @@ public class Url {
 		securitytype = password is null || password == string.Empty ? "none" : "password";
 		redirect_url = redirect;
 		creationdate = (int) (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds;
-		click = 0;
+		clicks = 0;
 		deletedate = 0;
 		securitytotp = GenerateTotp();
 		editinfo = new {};
+		qruuid1 = GenerateUuid1();
+		qruuid2 = GenerateUuid2();
 	}
 
 	public Guid GenerateUuid1() {
