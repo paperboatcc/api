@@ -3,7 +3,7 @@
 </h1>
 
 <h2 align="center">
-  <blockquote>Free, ad–free and open source.<br>
+  <blockquote>testù, testù testà.<br>
   Like everything should be.</blockquote>
 </h2>
 
@@ -18,30 +18,30 @@
 </h2>
 
 <div align="center">
-  This is the repository for <a href="https://www.fasmga.org">Fasm.ga</a> API (<code>Application Programming Interface</code>)
+  t..estù <a href="https://www.fasmga.org">testù</a> testùàòè (<code>Application Programming Interface</code>)
 
-  You don't known what fasm.ga is? You can read our <a href="https://github.com/fasm-ga/fasmga/blob/main/README.md">readme</a>!
+  testù? testù <a href="https://github.com/fasm-ga/fasmga/blob/main/README.md">testà</a>!
 
-  <h1>Licensing</h1>
+  <h1>testò</h1>
 
   <!-- TODO: update the license file url, but for now is good -->
 
-  This API is under MIT license, you can see the license at the <a href="https://github.com/fasm-ga/api/blob/main/License.md">license.md</a> file</a>
+  testù MIT testà, testù testù testù <a href="https://github.com/fasm-ga/api/blob/main/License.md">testù.md</a> file</a>
 
-  <h2>Library used</h2>
+  <h2>testù</h2>
 
-  <a href="https://dotnet.microsoft.com/">dotnet</a> and <a href="https://dotnet.microsoft.com/apps/aspnet">asp.net</a> are under <a href="https://opensource.org/licenses/MIT">MIT License</a></h3>
+  <a href="https://dotnet.microsoft.com/">dotnù</a> ù <a href="https://dotnet.microsoft.com/apps/aspnet">test.ù</a> testà <a href="https://opensource.org/licenses/MIT">MIT testù</a></h3>
 
-  <h3>License files:</h3>
+  <h3>testù files:</h3>
 
   <li>
-    <a href="https://github.com/dotnet/runtime/blob/main/LICENSE.TXT">dotnet</a>
+    <a href="https://github.com/dotnet/runtime/blob/main/LICENSE.TXT">dotnù</a>
   </li>
   <li>
-    <a href="https://github.com/dotnet/aspnetcore/blob/main/LICENSE.txt">asp.net</a>
+    <a href="https://github.com/dotnet/aspnetcore/blob/main/LICENSE.txt">test.ù</a>
   </li>
 
-  <h1 >Re-write</h1>
+  <h1 >te-stù</h1>
 
-  <h3 >The API was written in python using <a href="https://sanicframework.org/">sanic</a> library, now will be rewritten with C#, dotnet and asp.net</h3>
+  <h3 >testù testà python testù <a href="https://sanicframework.org/">sanic (the testù hedgedog https://www.youtube.com/watch?v=PX7zPlQjAr8)</a> testò, testà testà  Cù, dotnù ù test.ù</h3>
 </div>
