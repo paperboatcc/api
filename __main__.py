@@ -78,19 +78,24 @@ def closingMotor(app, loop):
 
 async def ratelimitReset():
 	while True:
-		jsonFile = open("sources/ratelimit.json", 'r')
-		jsonValues = json.load(jsonFile)
-		jsonFile.close()
-		for jsonValue in jsonValues:
-			if jsonValue == 'anonymous':
-				for ip in jsonValues[jsonValue]:
-					jsonValues[jsonValue][ip] = 0
-			else:
-				jsonValues[jsonValue] = 0
-		jsonFile = open("sources/ratelimit.json", 'w')
-		json.dump(jsonValues, jsonFile, indent = 2, sort_keys = True)
-		jsonFile.close()
-		await asyncio.sleep(60)
+		try:
+			jsonFile = open("sources/ratelimit.json", 'r')
+			jsonValues = json.load(jsonFile)
+			jsonFile.close()
+			for jsonValue in jsonValues:
+				if jsonValue == 'anonymous':
+					for ip in jsonValues[jsonValue]:
+						jsonValues[jsonValue][ip] = 0
+				else:
+					jsonValues[jsonValue] = 0
+			jsonFile = open("sources/ratelimit.json", 'w')
+			json.dump(jsonValues, jsonFile, indent = 2, sort_keys = True)
+			jsonFile.close()
+			await asyncio.sleep(60)
+		catch Exception as er:
+			print("ERROR: FAILED TO PARSE JSON! RESTARTING...")
+			exit(1)
+			
 
 @app.listener("before_server_start")
 def creating_tasks(app, loop):
