@@ -91,8 +91,8 @@ async def ratelimitReset():
 			jsonFile = open("sources/ratelimit.json", 'w')
 			json.dump(jsonValues, jsonFile, indent = 2, sort_keys = True)
 			jsonFile.close()
-			await asyncio.sleep(60)
-        except Exception as er:
+			await asyncio.sleep(60)		
+		except Exception as er:
 			print("ERROR: FAILED TO PARSE JSON! RESTARTING...")
 			exit(1)
 			
