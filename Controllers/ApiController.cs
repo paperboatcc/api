@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
-
+using MongoDB.Driver;
+using MongoDB.Bson;
+using fasmga.Services;
 namespace fasmga.Controllers;
 
 [ApiController]
@@ -8,8 +10,10 @@ namespace fasmga.Controllers;
 public class ApiController : ControllerBase
 {
 	private ILogger<ApiController> Logger;
+	private MongoClient Database;
 
-	public ApiController(ILogger<ApiController> logger) {
+	public ApiController(Database database, ILogger<ApiController> logger) {
+		Database = database.Client;
 		Logger = logger;
 	}
 
@@ -21,7 +25,7 @@ public class ApiController : ControllerBase
 
 	[HttpGet("test")]
 	public IActionResult Test() {
-		Url url = new(id: "testu", redirect: "https://example.com", nsfw: false, owner: new User("mona", "apitoken", false));
+		Url url = new(ID: "testu", redirect: "https://example.com", nsfw: false, owner: new User("mona", "apitoken", false));
 
 		Logger.LogInformation(JsonSerializer.Serialize<Url>(url));
 
@@ -43,5 +47,28 @@ public class ApiController : ControllerBase
 		Logger.LogInformation($"Token: {token}");
 
 		return Ok($"Here your token {token}");
+	}
+
+	[HttpGet("mongo")]
+	public IActionResult Mongo() {
+    IMongoDatabase database = Database.GetDatabase("testing");
+    IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("url");
+
+		BsonDocument document = new Url($"test-{(int) (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds}", new User("sciopone", "tokenone", false), "https://mio", false).ToBsonDocument();
+
+		collection.InsertOne(document);
+
+		FilterDefinition<BsonDocument> filter = Builders<BsonDocument>.Filter.Eq("ID", "wlhywgnx");
+
+		IFindFluent<BsonDocument, BsonDocument> query = collection.Find(filter);
+
+		if (query.CountDocuments() == 0) {
+			return NotFound("No document found");
+		}
+
+		BsonDocument result = query.FirstOrDefault();
+		result.Remove("_id");
+
+		return Ok(result.ToJson());
 	}
 }

@@ -4,7 +4,6 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <DebugType>portable</DebugType>
     <Authors>Fleny113</Authors>
     <Company>fasm.ga</Company>
     <Product>$(AssemblyName) api</Product>
@@ -14,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MongoDB.Driver" Version="2.13.2" />
     <PackageReference Include="Otp.NET" Version="1.2.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
