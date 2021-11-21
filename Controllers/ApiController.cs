@@ -1,20 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
-using MongoDB.Driver;
-using MongoDB.Bson;
-using fasmga.Services;
-namespace fasmga.Controllers;
+using Fasmga.Services;
+namespace Fasmga.Controllers;
 
 [ApiController]
 [Route("/v1")]
 public class ApiController : ControllerBase
 {
-	private ILogger<ApiController> Logger;
-	private MongoClient Database;
+	private ILogger<ApiController> _logger;
+	private readonly UrlService _urlService;
+	private readonly UserService _userService;
 
-	public ApiController(Database database, ILogger<ApiController> logger) {
-		Database = database.Client;
-		Logger = logger;
+	public ApiController(UrlService urlService, UserService userService, ILogger<ApiController> logger) {
+		_urlService = urlService;
+		_userService = userService;
+		_logger = logger;
 	}
 
 	[HttpGet()]
@@ -25,9 +25,17 @@ public class ApiController : ControllerBase
 
 	[HttpGet("test")]
 	public IActionResult Test() {
-		Url url = new(ID: "testu", redirect: "https://example.com", nsfw: false, owner: new User("mona", "apitoken", false));
+		string? apiToken = Environment.GetEnvironmentVariable("TestingApiToken");
 
-		Logger.LogInformation(JsonSerializer.Serialize<Url>(url));
+		if (apiToken is null) {
+			return StatusCode(500, "Invalid apiToken"); // 500 because it's a env variable
+		}
+
+		User owner = _userService.Get(apiToken);
+
+		Url url = new(ID: "testu", redirect: "https://example.com", nsfw: false, owner: owner);
+
+		_logger.LogInformation(JsonSerializer.Serialize<Url>(url));
 
 		return Ok(JsonSerializer.Serialize<Url>(url));
 	}
@@ -36,7 +44,7 @@ public class ApiController : ControllerBase
 	[ProducesResponseType(200)]
 	[ProducesResponseType(400)]
 	public IActionResult Header([FromHeader] string Authentication) {
-		Logger.LogInformation($"Auth healder: {Authentication}");
+		_logger.LogInformation($"Auth healder: {Authentication}");
 
 		if (!Authentication.StartsWith("Basic ")) {
 			return BadRequest("Invalid token type. Use a Basic token!");
@@ -44,31 +52,31 @@ public class ApiController : ControllerBase
 
 		string token = Authentication.Split("Basic ")[1];
 
-		Logger.LogInformation($"Token: {token}");
+		_logger.LogInformation($"Token: {token}");
 
 		return Ok($"Here your token {token}");
 	}
 
 	[HttpGet("mongo")]
 	public IActionResult Mongo() {
-    IMongoDatabase database = Database.GetDatabase("testing");
-    IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("url");
+		string? apiToken = Environment.GetEnvironmentVariable("TestingApiToken");
 
-		BsonDocument document = new Url($"test-{(int) (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds}", new User("sciopone", "tokenone", false), "https://mio", false).ToBsonDocument();
-
-		collection.InsertOne(document);
-
-		FilterDefinition<BsonDocument> filter = Builders<BsonDocument>.Filter.Eq("ID", "wlhywgnx");
-
-		IFindFluent<BsonDocument, BsonDocument> query = collection.Find(filter);
-
-		if (query.CountDocuments() == 0) {
-			return NotFound("No document found");
+		if (apiToken is null) {
+			return StatusCode(500, "Invalid apiToken"); // 500 because it's a env variable
 		}
 
-		BsonDocument result = query.FirstOrDefault();
-		result.Remove("_id");
+		User owner = _userService.Get(apiToken);
 
-		return Ok(result.ToJson());
+		Url url = new($"test-{(int) (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds}", owner, "https://example.com", false);
+
+		_urlService.Create(url);
+
+		Url find = _urlService.Get(url.ID);
+
+		if (find is null) {
+			return NotFound("url ID invalid");
+		}
+
+		return Ok(find);
 	}
 }

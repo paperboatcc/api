@@ -30,7 +30,9 @@
 
   <h2>Library used</h2>
 
-  <a href="https://dotnet.microsoft.com/">dotnet</a> and <a href="https://dotnet.microsoft.com/apps/aspnet">asp.net</a> are under <a href="https://opensource.org/licenses/MIT">MIT License</a></h3>
+  <a href="https://dotnet.microsoft.com/">dotnet</a>, <a href="https://dotnet.microsoft.com/apps/aspnet">asp.net</a>, <a href="https://www.nuget.org/packages/Swashbuckle.AspNetCore/">Swashbuckle.AspNetCore</a> and <a href="https://www.nuget.org/packages/Otp.NET">Otp.NET</a> are under <a href="https://opensource.org/licenses/MIT">MIT License</a></h3>
+
+  <a href="https://mongodb.github.io/mongo-csharp-driver/">MongoDB C# Driver</a> are under <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache-2.0 License</a>
 
   <h3>License files:</h3>
 
@@ -39,6 +41,15 @@
   </li>
   <li>
     <a href="https://github.com/dotnet/aspnetcore/blob/main/LICENSE.txt">asp.net</a>
+  </li>
+    <li>
+    <a href="https://github.com/domaindrivendev/Swashbuckle.AspNetCore/blob/master/LICENSE">Swashbuckle.AspNetCore</a>
+  </li>
+  <li>
+    <a href="https://github.com/kspearrin/Otp.NET/blob/master/LICENSE.txt">Otp.NET</a>
+  </li>
+  <li>
+    <a href="https://github.com/mongodb/mongo-csharp-driver/blob/master/License.txt">MongoDB C# Driver</a>
   </li>
 
   <h1 >Re-write</h1>

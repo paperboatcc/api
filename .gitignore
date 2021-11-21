@@ -5,3 +5,6 @@
 # dotnet restore / build files
 bin/
 obj/ 
+
+# env file
+.env

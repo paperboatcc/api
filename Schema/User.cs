@@ -1,14 +1,32 @@
-namespace fasmga;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
+namespace Fasmga;
 
 public class User {
-	public string username { get; }
-	public string apiToken { get; }
+	[BsonId]
+  [BsonRepresentation(BsonType.ObjectId)]
+	public string? _id { get; set; }
+	public string username { get; set; }
+	public string? password { get; set; }
+	[BsonElement("login_token")]
+	public string? loginToken { get; set; }
+	[BsonElement("api_token")]
+	public string apiToken { get; set; }
+	[BsonElement("is_banned")]
 	public bool banned { get; set; }
-	public bool premium { get; }
+	public string? totp { get; set; }
+	[BsonElement("2fa_enabled")]
+	public bool? twofactorauth { get; set; }
+	[BsonElement("is_premium")]
+	public bool premium { get; set; }
+	[BsonElement("creation_date")]
+	public int? creationdate { get; set; }
 
-	public User(string username, string apiToken, bool banned) {
+	public User(string username, string apiToken, bool banned, bool premium) {
 		this.username = username;
 		this.apiToken = apiToken;
 		this.banned = banned;
+		this.premium = premium;
 	}
 }

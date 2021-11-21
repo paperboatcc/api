@@ -1,31 +1,33 @@
-using MongoDB.Bson;
 using OtpNet;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
-namespace fasmga;
+namespace Fasmga;
 
 public class Url {
-	public string ID { get; }
-	public string redirect_url { get; }
-	public string owner { get; }
+  [BsonId]
+  [BsonRepresentation(BsonType.ObjectId)]
+	public string? _id { get; set; }
+	public string ID { get; set; }
+	[BsonElement("redirect_url")]
+	public string redirect { get; set; }
+	public string owner { get; set; }
 	public string password { get; set; }
 	public bool nsfw { get; set; }
 	public bool captcha { get; set; }
-	public int clicks { get; set; }
 	public bool unembedify { get; set; }
+	public int clicks { get; set; }
 	public int deletedate { get; set; }
 	public object editinfo { get; set; }
 	public string qruuid1 { get; set; }
 	public string qruuid2 { get; set; }
 	public string securitytype { get; set; }
 	public string securitytotp { get; set; }
-	public int creationdate { get; }
+	public int creationdate { get; set; }
 
 	public Url(string ID, User owner, string redirect, bool nsfw, string password = "", bool captcha = false, bool unembedify = false) {
-		byte[] key = KeyGeneration.GenerateRandomKey(20);
-		string base32String = Base32Encoding.ToString(key);
-
 		this.ID = ID;
-		this.redirect_url = redirect;
+		this.redirect = redirect;
 		this.owner = owner.username;
 		this.nsfw = nsfw;
 		this.captcha = captcha;
@@ -62,26 +64,5 @@ public class Url {
 
 		this.securitytotp = base32String;
 		return base32String;
-	}
-
-	public BsonDocument ToBsonDocument() {
-		return new BsonDocument()
-		{
-			{ "ID", ID },
-			{ "redirect_url", redirect_url },
-			{ "owner", owner },
-			{ "password", password },
-			{ "nsfw", nsfw },
-			{ "captcha", captcha },
-			{ "unembedify", unembedify },
-			{ "qruuid1", qruuid1 },
-			{ "qruuid2", qruuid2 },
-			{ "editinfo", editinfo.ToBsonDocument() },
-			{ "clicks", clicks },
-			{ "securitytype", securitytype },
-			{ "securitytotp", securitytotp },
-			{ "creationdate", creationdate },
-			{ "deletedate", deletedate },
-		};
 	}
 }
