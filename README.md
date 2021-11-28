@@ -18,21 +18,21 @@
 </h2>
 
 <div align="center">
-  This is the repository for <a href="https://www.fasmga.org">Fasm.ga</a> API (<code>Application Programming Interface</code>)
+  This is the repository for the <a href="https://www.fasmga.org">Fasm.ga</a> API (<code>Application Programming Interface</code>)
 
-  You don't known what fasm.ga is? You can read our <a href="https://github.com/fasm-ga/fasmga/blob/main/README.md">readme</a>!
+  You don't know what fasm.ga is? You can read our <a href="https://github.com/fasm-ga/fasmga/blob/main/README.md">readme</a>!
 
   <h1>Licensing</h1>
 
   <!-- TODO: update the license file url, but for now is good -->
 
-  This API is under MIT license, you can see the license at the <a href="https://github.com/fasm-ga/api/blob/main/License.md">license.md</a> file</a>
+  This API is under MIT license, you can see the license in the <a href="https://github.com/fasm-ga/api/blob/main/License.md">license.md</a> file</a>
 
   <h2>Library used</h2>
 
   <a href="https://dotnet.microsoft.com/">dotnet</a>, <a href="https://dotnet.microsoft.com/apps/aspnet">asp.net</a>, <a href="https://www.nuget.org/packages/Swashbuckle.AspNetCore/">Swashbuckle.AspNetCore</a> and <a href="https://www.nuget.org/packages/Otp.NET">Otp.NET</a> are under <a href="https://opensource.org/licenses/MIT">MIT License</a></h3>
 
-  <a href="https://mongodb.github.io/mongo-csharp-driver/">MongoDB C# Driver</a> are under <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache-2.0 License</a>
+  <a href="https://mongodb.github.io/mongo-csharp-driver/">MongoDB C# Driver</a> is under <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache-2.0 License</a>
 
   <h3>License files:</h3>
 
@@ -54,5 +54,5 @@
 
   <h1 >Re-write</h1>
 
-  <h3 >The API was written in python using <a href="https://sanicframework.org/">sanic</a> library, now will be rewritten with C#, dotnet and asp.net</h3>
+  <h3 >The API was written in python using <a href="https://sanicframework.org/">sanic</a> library, now it will be rewritten with C#, dotnet and asp.net</h3>
 </div>
