@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using Fasmga.Services;
+
 namespace Fasmga.Controllers;
 
 [ApiController]
@@ -11,7 +12,8 @@ public class ApiController : ControllerBase
 	private readonly UrlService _urlService;
 	private readonly UserService _userService;
 
-	public ApiController(UrlService urlService, UserService userService, ILogger<ApiController> logger) {
+	public ApiController(UrlService urlService, UserService userService, ILogger<ApiController> logger)
+	{
 		_urlService = urlService;
 		_userService = userService;
 		_logger = logger;
@@ -24,7 +26,8 @@ public class ApiController : ControllerBase
 	}
 
 	[HttpGet("test")]
-	public IActionResult Test() {
+	public IActionResult Test()
+	{
 		string? apiToken = Environment.GetEnvironmentVariable("TestingApiToken");
 
 		if (apiToken is null) {
@@ -33,7 +36,7 @@ public class ApiController : ControllerBase
 
 		User owner = _userService.Get(apiToken);
 
-		Url url = new(ID: "testu", redirect: "https://example.com", nsfw: false, owner: owner);
+		Url url = new(redirect: "https://example.com", nsfw: false, owner: owner);
 
 		_logger.LogInformation(JsonSerializer.Serialize<Url>(url));
 
@@ -43,7 +46,8 @@ public class ApiController : ControllerBase
 	[HttpGet("header")]
 	[ProducesResponseType(200)]
 	[ProducesResponseType(400)]
-	public IActionResult Header([FromHeader] string Authentication) {
+	public IActionResult Header([FromHeader] string Authentication)
+	{
 		_logger.LogInformation($"Auth healder: {Authentication}");
 
 		if (!Authentication.StartsWith("Basic ")) {
@@ -58,7 +62,8 @@ public class ApiController : ControllerBase
 	}
 
 	[HttpGet("mongo")]
-	public IActionResult Mongo() {
+	public IActionResult Mongo()
+	{
 		string? apiToken = Environment.GetEnvironmentVariable("TestingApiToken");
 
 		if (apiToken is null) {
@@ -67,16 +72,23 @@ public class ApiController : ControllerBase
 
 		User owner = _userService.Get(apiToken);
 
-		Url url = new($"test-{(int) (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds}", owner, "https://example.com", false);
+		Url url = new(owner, "https://example.com", false);
+
+		for (int i = 0; i < 4; i++)
+		{
+			url.CheckUnique((UrlUniqueValues) i, _urlService);
+		}
 
 		_urlService.Create(url);
 
-		Url find = _urlService.Get(url.ID);
+		// return NoContent(); // approximately 137ms ( create )
+
+		Url find = _urlService.Get("nnTaX");
 
 		if (find is null) {
 			return NotFound("url ID invalid");
 		}
 
-		return Ok(find);
+		return Ok(find); // approximately 1620 ms ( find + create )
 	}
 }

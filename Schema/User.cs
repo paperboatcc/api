@@ -6,7 +6,7 @@ namespace Fasmga;
 public class User {
 	[BsonId]
   [BsonRepresentation(BsonType.ObjectId)]
-	public string? _id { get; set; }
+	private string? _id { get; set; }
 	public string username { get; set; }
 	public string? password { get; set; }
 	[BsonElement("login_token")]
@@ -23,7 +23,8 @@ public class User {
 	[BsonElement("creation_date")]
 	public int? creationdate { get; set; }
 
-	public User(string username, string apiToken, bool banned, bool premium) {
+	public User(string username, string apiToken, bool banned, bool premium)
+	{
 		this.username = username;
 		this.apiToken = apiToken;
 		this.banned = banned;
