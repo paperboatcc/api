@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 using Fasmga.Services;
+using Fasmga.Helpers;
 
 namespace Fasmga.Controllers;
 
@@ -11,84 +11,75 @@ public class ApiController : ControllerBase
 	private ILogger<ApiController> _logger;
 	private readonly UrlService _urlService;
 	private readonly UserService _userService;
+	private readonly Authorization _authorization;
 
 	public ApiController(UrlService urlService, UserService userService, ILogger<ApiController> logger)
 	{
 		_urlService = urlService;
 		_userService = userService;
+		_authorization = new Authorization(_userService);
 		_logger = logger;
 	}
 
-	[HttpGet()]
-	public IActionResult Get()
+	// I can leave 404? yes. So why i put 204? because why not? 🙂
+	[HttpGet]
+	[ProducesResponseType(204)]
+	public IActionResult Index() => NoContent();
+
+	[HttpGet("urls")]
+	public IActionResult GetUserUrls([FromHeader] string Authorization)
 	{
-		return Ok("Hello world!");
-	}
+		var AuthResult = _authorization.checkAuthorization(Authorization);
 
-	[HttpGet("test")]
-	public IActionResult Test()
-	{
-		string? apiToken = Environment.GetEnvironmentVariable("TestingApiToken");
-
-		if (apiToken is null) {
-			return StatusCode(500, "Invalid apiToken"); // 500 because it's a env variable
-		}
-
-		User owner = _userService.Get(apiToken);
-
-		Url url = new(redirect: "https://example.com", nsfw: false, owner: owner);
-
-		_logger.LogInformation(JsonSerializer.Serialize<Url>(url));
-
-		return Ok(JsonSerializer.Serialize<Url>(url));
-	}
-
-	[HttpGet("header")]
-	[ProducesResponseType(200)]
-	[ProducesResponseType(400)]
-	public IActionResult Header([FromHeader] string Authentication)
-	{
-		_logger.LogInformation($"Auth healder: {Authentication}");
-
-		if (!Authentication.StartsWith("Basic ")) {
-			return BadRequest("Invalid token type. Use a Basic token!");
-		}
-
-		string token = Authentication.Split("Basic ")[1];
-
-		_logger.LogInformation($"Token: {token}");
-
-		return Ok($"Here your token {token}");
-	}
-
-	[HttpGet("mongo")]
-	public IActionResult Mongo()
-	{
-		string? apiToken = Environment.GetEnvironmentVariable("TestingApiToken");
-
-		if (apiToken is null) {
-			return StatusCode(500, "Invalid apiToken"); // 500 because it's a env variable
-		}
-
-		User owner = _userService.Get(apiToken);
-
-		Url url = new(owner, "https://example.com", false);
-
-		for (int i = 0; i < 4; i++)
+		if (!AuthResult.Allow || AuthResult.User is null)
 		{
-			url.CheckUnique((UrlUniqueValues) i, _urlService);
+			return StatusCode(403, AuthResult.Message);
 		}
 
-		_urlService.Create(url);
+		List<object> urls = new();
+		_urlService.GetUserUrls(AuthResult.User).ForEach(u => {
+			urls.Add(new { u.ID, u.owner, u.redirect, u.nsfw, u.captcha, u.unembedify, u.clicks, u.securitytype, u.creationdate });
+		});
 
-		// return NoContent(); // approximately 137ms ( create )
-
-		Url find = _urlService.Get("nnTaX");
-
-		if (find is null) {
-			return NotFound("url ID invalid");
-		}
-
-		return Ok(find); // approximately 1620 ms ( find + create )
+		return Ok(urls);
 	}
+
+	[HttpGet("urls/{id}")]
+	public IActionResult GetUrlInfo([FromRoute] string id) {
+		Url url = _urlService.Get(id);
+
+		return Ok(new { url.ID, url.owner, url.redirect, url.nsfw, url.captcha, url.unembedify, url.clicks, url.securitytype, url.creationdate });
+	}
+
+	// [HttpGet("mongo")]
+	// public IActionResult Mongo()
+	// {
+	// 	string? apiToken = Environment.GetEnvironmentVariable("TestingApiToken");
+
+	// 	if (apiToken is null) {
+	// 		return StatusCode(500, "Invalid apiToken"); // 500 because it's a env variable
+	// 	}
+
+	// 	User owner = _userService.Get(apiToken);
+
+	// 	Url url = new(owner, "https://example.com", false);
+
+	// 	for (int i = 0; i < 4; i++)
+	// 	{
+	// 		url.CheckUnique((UrlUniqueValues) i, _urlService);
+	// 	}
+
+	// 	_urlService.Create(url);
+
+	// 	// return NoContent(); // approximately 137ms ( create )
+
+	// 	Url find = _urlService.Get("nnTaX");
+
+	// 	if (find is null) {
+	// 		return NotFound("url ID invalid");
+	// 	}
+
+	// 	return Ok(find); // approximately 1620 ms ( find + create )
+	// }
 }
+
