@@ -1,8 +1,11 @@
 using OtpNet;
+using Newtonsoft.Json;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Fasmga.Services;
 using Fasmga.Helpers;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace Fasmga;
 
@@ -20,46 +23,75 @@ public class Url {
 	private string? _id { get; set; }
 	public string ID { get; set; }
 	[BsonElement("redirect_url")]
-	public string redirect { get; set; }
-	public string owner { get; set; }
-	public string password { get; set; }
-	public bool nsfw { get; set; }
-	public bool captcha { get; set; }
-	public bool unembedify { get; set; }
-	public int clicks { get; set; }
-	public int deletedate { get; set; }
-	public object editinfo { get; set; }
-	public string qruuid1 { get; set; }
-	public string qruuid2 { get; set; }
-	public string securitytype { get; set; }
-	public string securitytotp { get; set; }
-	public int creationdate { get; set; }
+	[JsonProperty("redirect_url")]
+	public string Redirect { get; set; }
+	[BsonElement("owner")]
+	[JsonProperty("owner")]
+	public string Owner { get; set; }
+	[BsonElement("password")]
+	[JsonProperty("password")]
+	public string? Password { get; set; }
+	[BsonElement("nsfw")]
+	[JsonProperty("nsfw")]
+	public bool Nsfw { get; set; }
+	[BsonElement("captcha")]
+	[JsonProperty("captcha")]
+	public bool Captcha { get; set; }
+	[BsonElement("unembedify")]
+	[JsonProperty("unembedify")]
+	public bool Unembedify { get; set; }
+	[BsonElement("clicks")]
+	[JsonProperty("clicks")]
+	public int Clicks { get; set; }
+	[BsonElement("deletedate")]
+	[JsonProperty("deletedate")]
+	public int Deletedate { get; set; }
+	[BsonElement("editinfo")]
+	[JsonProperty("editinfo")]
+	public object Editinfo { get; set; }
+	[BsonElement("qruuid1")]
+	[JsonProperty("qruuid1")]
+	public string Qruuid1 { get; set; }
+	[BsonElement("qruuid2")]
+	[JsonProperty("qruuid2")]
+	public string Qruuid2 { get; set; }
+	[BsonElement("securitytype")]
+	[JsonProperty("securitytype")]
+	public string Securitytype { get; set; }
+	[BsonElement("securitytotp")]
+	[JsonProperty("securitytotp")]
+	public string Securitytotp { get; set; }
+	[BsonElement("creationdate")]
+	[JsonProperty("creationdate")]
+	public int Creationdate { get; set; }
+	private UrlOptions IdOptions { get; set; }
 
 	public Url(User owner, string redirect, bool nsfw, UrlOptions? idOptions = null, string password = "", bool captcha = false, bool unembedify = false)
 	{
-		this.redirect = redirect;
-		this.owner = owner.username;
-		this.nsfw = nsfw;
-		this.captcha = captcha;
-		this.unembedify = unembedify;
-		this.password = password;
+		Redirect = redirect;
+		Owner = owner.Username;
+		Nsfw = nsfw;
+		Captcha = captcha;
+		Unembedify = unembedify;
+		Password = string.IsNullOrEmpty(password) ? "" : Convert.ToHexString(SHA512.Create().ComputeHash(Encoding.UTF8.GetBytes(password)));
+		IdOptions = idOptions ?? new();
 
-		ID = GenerateID(idOptions);
-		securitytype = password is null || password == string.Empty ? "none" : "password";
-		creationdate = (int) (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds;
-		clicks = 0;
-		deletedate = 0;
-		securitytotp = GenerateTotp();
-		editinfo = new Object();
-		qruuid1 = GenerateUuid1();
-		qruuid2 = GenerateUuid2();
+		ID = GenerateID();
+		Securitytype = Password is null || string.IsNullOrEmpty(Password) ? "none" : "password";
+		Creationdate = (int) (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds;
+		Clicks = 0;
+		Deletedate = 0;
+		Securitytotp = GenerateTotp();
+		Editinfo = new Object();
+		Qruuid1 = GenerateUuid1();
+		Qruuid2 = GenerateUuid2();
 	}
 
 	public string GenerateUuid1()
 	{
 		string newUuid1 = Guid.NewGuid().ToString();
 
-		this.qruuid1 = newUuid1;
+		this.Qruuid1 = newUuid1;
 		return newUuid1;
 	}
 
@@ -67,7 +99,7 @@ public class Url {
 	{
 		string newUuid2 = Guid.NewGuid().ToString();
 
-		this.qruuid2 = newUuid2;
+		this.Qruuid2 = newUuid2;
 		return newUuid2;
 	}
 
@@ -76,88 +108,138 @@ public class Url {
 		byte[] key = KeyGeneration.GenerateRandomKey(20);
 		string base32String = Base32Encoding.ToString(key);
 
-		this.securitytotp = base32String;
+		this.Securitytotp = base32String;
 		return base32String;
 	}
 
-	public string GenerateID(UrlOptions? options = null) {
-		if (options is null) {
-			options = new UrlOptions();
-		}
-		
-		if (options.staticID is not null)
+	public string GenerateID() {
+		if (IdOptions.StaticID is not null)
 		{
-			return options.staticID;
+			return IdOptions.StaticID;
 		}
 
-		return UrlIDGenerator.Generate(options.genIDType ?? "lowercase", options.length ?? 8);
+		return UrlIDGenerator.Generate(IdOptions.IDType ?? "lowercase", IdOptions.Length == 0 ? 8 : IdOptions.Length);
 	}
 
-	public int CheckUnique(UrlUniqueValues value, UrlService service)
+	public bool CheckUnique(UrlUniqueValues value, UrlService service)
 	{
-		int attempt = 0;
-
 		switch (value)
 		{
 			case UrlUniqueValues.ID:
-				while (service.Get().Where(u => u.ID == ID).Count() > 0 && attempt < 100) {
+				while (service.Get().Where(u => u.ID == ID).Count() > 0) {
+					string oldID = ID;
 					ID = GenerateID();
-					attempt++;
+					if (ID == oldID) return false;
 				}
 				break;
 			case UrlUniqueValues.qruuid1:
-				while (service.Get().Where(u => u.qruuid1 == qruuid1).Count() > 0 && attempt < 100) {
-					qruuid1 = GenerateUuid1();
-					attempt++;
+				while (service.Get().Where(u => u.Qruuid1 == Qruuid1).Count() > 0) {
+					Qruuid1 = GenerateUuid1();
 				}
 				break;
 			case UrlUniqueValues.qruuid2:
-				while (service.Get().Where(u => u.qruuid2 == qruuid2).Count() > 0 && attempt < 100) {
-					qruuid2 = GenerateUuid2();
-					attempt++;
+				while (service.Get().Where(u => u.Qruuid2 == Qruuid2).Count() > 0) {
+					Qruuid2 = GenerateUuid2();
 				}
 				break;
 			case UrlUniqueValues.securitytotp:
-				while (service.Get().Where(u => u.securitytotp == securitytotp).Count() > 0 && attempt < 100) {
-					securitytotp = GenerateTotp();
-					attempt++;
+				while (service.Get().Where(u => u.Securitytotp == Securitytotp).Count() > 0) {
+					Securitytotp = GenerateTotp();
 				}
 				break;
 			default:
-				while (service.Get().Where(u => u.ID == ID).Count() > 0 && attempt < 100) {
+				while (service.Get().Where(u => u.ID == ID).Count() > 0) {
 					ID = GenerateID();
-					attempt++;
 				}
 				break;
 		}
 
-		return attempt;
+		return true;
 	}
+
+	public override string ToString() => JsonConvert.SerializeObject(this);
+
+	public object ToObject() => new { ID, owner = Owner, redirect = Redirect, nsfw = Nsfw, captcha = Captcha, unembedify = Unembedify, clicks = Clicks, securitytype = Securitytype, creationdate = Creationdate };
 }
 
 public class UrlOptions {
-	public string? staticID { get; set; }
-	public string? genIDType { get; set; }
-	public int? length { get; set; }
+	public string? StaticID { get; set; }
+	public string? IDType { get; set; }
+	public int Length { get; set; }
 
 	public UrlOptions()
 	{
-		staticID = null;
-		genIDType = "lowercase";
-		length = 8;
+		StaticID = null;
+		IDType = "lowercase";
+		Length = 8;
 	}
 
 	public UrlOptions(string ID)
 	{
-		staticID = ID;
-		genIDType = null;
-		length = null;
+		StaticID = ID;
+		IDType = null;
+		Length = 0;
 	}
 
 	public UrlOptions(string genIDType, int length = 8)
 	{
-		staticID = null;
-		this.genIDType = genIDType;
-		this.length = length;
+		StaticID = null;
+		
+
+		if (genIDType is null || !(genIDType.Contains("lowercase") || genIDType.Contains("uppercase") || genIDType.Contains("numbers")))
+		{
+			genIDType = "lowercase";
+		}
+		else
+		{
+			IDType = genIDType;
+		}
+
+		Length = length;
+	}
+
+	public override string ToString() => JsonConvert.SerializeObject(this);
+}
+
+public class UrlRequest
+{
+	public string Redirect { get; set; }
+	public string? Password { get; set; }
+	public bool Nsfw { get; set; }
+	public bool Captcha { get; set; }
+	public bool Unembedify { get; set; }
+	public string? Type { get; set; }
+	public int Length { get; set; }
+	public string? Id { get; set; }
+	public UrlOptions? Options { get; set;}
+
+	public UrlRequest(string redirect, bool nsfw = false, string password = "", bool captcha = false, bool unembedify = false, string type = "lowercase", int length = 8, string? id = null)
+	{
+		Redirect = redirect;
+		Nsfw = nsfw;
+		Password = password;
+		Captcha = captcha;
+		Unembedify = unembedify;
+		
+		Type = type;
+		Length = length == 0 ? 8 : length < 128 ? length : 128;
+		Id = id;
+		Options = Id is null ? new(Type, Length) : new(Id);
+	}
+
+	public override string ToString() => JsonConvert.SerializeObject(this);
+
+	public async Task<Url?> ToUrl(User owner, UrlService urlService)
+	{
+		Url url = new(owner, Redirect, Nsfw, Options, Password is null ? "" : Password, Captcha, Unembedify);
+
+		var IDUnique = await Task.Run(() => url.CheckUnique(UrlUniqueValues.ID, urlService));
+		await Task.Run(() => url.CheckUnique(UrlUniqueValues.qruuid1, urlService));
+		await Task.Run(() => url.CheckUnique(UrlUniqueValues.qruuid2, urlService));
+		await Task.Run(() => url.CheckUnique(UrlUniqueValues.securitytotp, urlService));
+
+		if (!IDUnique) return null;
+
+		return url;
 	}
 }

@@ -25,7 +25,7 @@ public class UrlService
 
 	public dynamic Get(string id) => _urls.Find(Url => Url.ID == id).FirstOrDefault();
 
-	public List<Url> GetUserUrls(User user) => Get().Where(u => u.owner == user.username).ToList();
+	public List<Url> GetUserUrls(User user) => Get().Where(u => u.Owner == user.Username).ToList();
 	public Url Create(Url Url)
 	{
 		_urls.InsertOne(Url);

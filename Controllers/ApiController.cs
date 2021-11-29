@@ -26,6 +26,10 @@ public class ApiController : ControllerBase
 	[ProducesResponseType(204)]
 	public IActionResult Index() => NoContent();
 
+	// Here is the explanation for the code above:
+	// 1. First we check if the user has authorization to use the endpoint.
+	// 2. Get the URLs by User Authorization
+	// 3. Respond with the list of Url 
 	[HttpGet("urls")]
 	public IActionResult GetUserUrls([FromHeader] string Authorization)
 	{
@@ -38,48 +42,52 @@ public class ApiController : ControllerBase
 
 		List<object> urls = new();
 		_urlService.GetUserUrls(AuthResult.User).ForEach(u => {
-			urls.Add(new { u.ID, u.owner, u.redirect, u.nsfw, u.captcha, u.unembedify, u.clicks, u.securitytype, u.creationdate });
+			urls.Add(u.ToObject());
 		});
 
 		return Ok(urls);
 	}
 
+	// The code above does the following:
+	// 1. Get the URL by ID
+	// 2. Respond with that
 	[HttpGet("urls/{id}")]
-	public IActionResult GetUrlInfo([FromRoute] string id) {
+	public IActionResult GetUrlInfo([FromRoute] string id)
+	{
 		Url url = _urlService.Get(id);
 
-		return Ok(new { url.ID, url.owner, url.redirect, url.nsfw, url.captcha, url.unembedify, url.clicks, url.securitytype, url.creationdate });
+		if (url is null)
+		{
+			return NotFound();
+		}
+
+		return Ok(url.ToObject());
 	}
 
-	// [HttpGet("mongo")]
-	// public IActionResult Mongo()
-	// {
-	// 	string? apiToken = Environment.GetEnvironmentVariable("TestingApiToken");
+	// Here is the explanation for the code above:
+	// 1. First we check if the user has authorization to use the endpoint.
+	// 2. Creates a new Url instance from the request body
+	// 3. Save to database
+	// 4. Respond with the Url
+	[HttpPost("create")]
+	public async Task<IActionResult> CreateUrl([FromHeader] string Authorization, [FromBody] UrlRequest urlRequest)
+	{
+		var AuthResult = _authorization.checkAuthorization(Authorization);
 
-	// 	if (apiToken is null) {
-	// 		return StatusCode(500, "Invalid apiToken"); // 500 because it's a env variable
-	// 	}
+		if (!AuthResult.Allow || AuthResult.User is null)
+		{
+			return StatusCode(403, AuthResult.Message);
+		}
 
-	// 	User owner = _userService.Get(apiToken);
+		Url? url = await urlRequest.ToUrl(AuthResult.User, _urlService);
 
-	// 	Url url = new(owner, "https://example.com", false);
+		if (url is null)
+		{
+			return BadRequest(new { message = "Url id is already used!" });
+		}
 
-	// 	for (int i = 0; i < 4; i++)
-	// 	{
-	// 		url.CheckUnique((UrlUniqueValues) i, _urlService);
-	// 	}
+		_urlService.Create(url);
 
-	// 	_urlService.Create(url);
-
-	// 	// return NoContent(); // approximately 137ms ( create )
-
-	// 	Url find = _urlService.Get("nnTaX");
-
-	// 	if (find is null) {
-	// 		return NotFound("url ID invalid");
-	// 	}
-
-	// 	return Ok(find); // approximately 1620 ms ( find + create )
-	// }
+		return Created("/v1/urls", url);
+	}
 }
-

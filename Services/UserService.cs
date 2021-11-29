@@ -23,16 +23,16 @@ public class UserService
 
 	public List<User> Get() => _users.Find(User => true).ToList();
 
-	public User Get(string apiToken) => _users.Find(User => User.apiToken == apiToken).FirstOrDefault();
+	public User Get(string apiToken) => _users.Find(User => User.ApiToken == apiToken).FirstOrDefault();
 	public User Create(User User)
 	{
 		_users.InsertOne(User);
 		return User;
 	}
 
-	public void Update(string apiToken, User UserIn) => _users.ReplaceOne(User => User.apiToken == apiToken, UserIn);
+	public void Update(string apiToken, User UserIn) => _users.ReplaceOne(User => User.ApiToken == apiToken, UserIn);
 
-	public void Remove(User UserIn) => _users.DeleteOne(User => User.apiToken == User.apiToken);
+	public void Remove(User UserIn) => _users.DeleteOne(User => User.ApiToken == User.ApiToken);
 
-	public void Remove(string apiToken) => _users.DeleteOne(User => User.apiToken == apiToken);
+	public void Remove(string apiToken) => _users.DeleteOne(User => User.ApiToken == apiToken);
 }

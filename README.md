@@ -30,7 +30,7 @@
 
   <h2>Library used</h2>
 
-  <a href="https://dotnet.microsoft.com/">dotnet</a>, <a href="https://dotnet.microsoft.com/apps/aspnet">asp.net</a>, <a href="https://www.nuget.org/packages/Swashbuckle.AspNetCore/">Swashbuckle.AspNetCore</a> and <a href="https://www.nuget.org/packages/Otp.NET">Otp.NET</a> are under <a href="https://opensource.org/licenses/MIT">MIT License</a></h3>
+  <a href="https://dotnet.microsoft.com/">dotnet</a>, <a href="https://dotnet.microsoft.com/apps/aspnet">asp.net</a>, <a href="https://www.nuget.org/packages/Swashbuckle.AspNetCore/">Swashbuckle.AspNetCore</a>, <a href="https://www.nuget.org/packages/Microsoft.AspNetCore.Mvc.NewtonsoftJson">Microsoft.AspNetCore.Mvc.NewtonsoftJson</a> and <a href="https://www.nuget.org/packages/Otp.NET">Otp.NET</a> are under <a href="https://opensource.org/licenses/MIT">MIT License</a></h3>
 
   <a href="https://mongodb.github.io/mongo-csharp-driver/">MongoDB C# Driver</a> is under <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache-2.0 License</a>
 
@@ -42,7 +42,10 @@
   <li>
     <a href="https://github.com/dotnet/aspnetcore/blob/main/LICENSE.txt">asp.net</a>
   </li>
-    <li>
+  <li>
+    <a href="https://github.com/dotnet/aspnetcore/blob/main/LICENSE.txt">Microsoft.AspNetCore.Mvc.NewtonsoftJson</a>
+  </li>
+  <li>
     <a href="https://github.com/domaindrivendev/Swashbuckle.AspNetCore/blob/master/LICENSE">Swashbuckle.AspNetCore</a>
   </li>
   <li>

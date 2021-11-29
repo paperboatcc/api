@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -7,27 +8,41 @@ public class User {
 	[BsonId]
   [BsonRepresentation(BsonType.ObjectId)]
 	private string? _id { get; set; }
-	public string username { get; set; }
-	public string? password { get; set; }
+	[BsonElement("username")]
+	[JsonProperty("username")]
+	public string Username { get; set; }
+	[BsonElement("password")]
+	[JsonProperty("password")]
+	public string? Password { get; set; }
 	[BsonElement("login_token")]
-	public string? loginToken { get; set; }
+	[JsonProperty("login_token")]
+	public string? LoginToken { get; set; }
 	[BsonElement("api_token")]
-	public string apiToken { get; set; }
+	[JsonProperty("api_token")]
+	public string ApiToken { get; set; }
 	[BsonElement("is_banned")]
-	public bool banned { get; set; }
-	public string? totp { get; set; }
+	[JsonProperty("is_banned")]
+	public bool Banned { get; set; }
+	[BsonElement("totp")]
+	[JsonProperty("totp")]
+	public string? Totp { get; set; }
 	[BsonElement("2fa_enabled")]
-	public bool? twofactorauth { get; set; }
+	[JsonProperty("2fa_enabled")]
+	public bool? Twofactorauth { get; set; }
 	[BsonElement("is_premium")]
-	public bool premium { get; set; }
+	[JsonProperty("is_premium")]
+	public bool Premium { get; set; }
 	[BsonElement("creation_date")]
-	public int? creationdate { get; set; }
+	[JsonProperty("creation_date")]
+	public int? Creationdate { get; set; }
 
 	public User(string username, string apiToken, bool banned, bool premium)
 	{
-		this.username = username;
-		this.apiToken = apiToken;
-		this.banned = banned;
-		this.premium = premium;
+		Username = username;
+		ApiToken = apiToken;
+		Banned = banned;
+		Premium = premium;
 	}
+
+	public override string ToString() => JsonConvert.SerializeObject(this);
 }

@@ -10,7 +10,7 @@ DotEnv.Load(dotenvFile);
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson(options => options.UseMemberCasing());;
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
