@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Fasmga.Services;
 using Fasmga.Helpers;
+using Newtonsoft.Json;
 
 namespace Fasmga.Controllers;
 
@@ -89,5 +90,43 @@ public class ApiController : ControllerBase
 		_urlService.Create(url);
 
 		return Created("/v1/urls", url);
+	}
+
+	// Here is the explanation for the code above:
+	// 1. First we check if the user has authorization to use the endpoint.
+	// 2. Creates a new Url instance from the request body
+	// 3. Check if user can delete that url
+	// 4. Delete the url
+	// 5. Respond to user
+	[HttpDelete("delete")]
+	public IActionResult DeleteUrl([FromHeader] string Authorization, [FromQuery] string id)
+	{
+		var AuthResult = _authorization.checkAuthorization(Authorization);
+
+		if (!AuthResult.Allow || AuthResult.User is null)
+		{
+			return StatusCode(403, AuthResult.Message);
+		}
+
+		Url? url = _urlService.Get(id);
+
+		if (url is null)
+		{
+			return NotFound();
+		}
+
+		if (url.Owner != AuthResult.User.Username)
+		{
+			return StatusCode(401, new { error = "You cant delete url that aren't your" });
+		}
+
+		try
+		{
+			_urlService.Remove(url);
+		} catch {
+			return StatusCode(500, new { error = "Cannot delete url" });
+		}
+
+		return Ok(new { message = $"Deleted url with id {id}" });
 	}
 }
