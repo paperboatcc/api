@@ -243,3 +243,49 @@ public class UrlRequest
 		return url;
 	}
 }
+
+public class UrlEditRequest
+{
+	public string? Redirect { get; set; }
+	public string? Password { get; set; }
+	public bool? Nsfw { get; set; }
+	public bool? Captcha { get; set; }
+	public bool? Unembedify { get; set; }
+	public int DeleteDate { get; set; } // wip
+	public UrlEditRequest? EditInfo { get; set; } // wip
+
+	public UrlEditRequest(
+		string? redirect = null,
+		string? password = null,
+		bool? nsfw = null,
+		bool? captcha = null,
+		bool? unembedify = null,
+		int deletedate = 0, 
+		UrlEditRequest? editinfo = null
+	)
+    {
+		Redirect = redirect;
+		Password = password;
+		Nsfw = nsfw;
+		Captcha = captcha;
+		Unembedify = unembedify;
+		DeleteDate = deletedate;
+		EditInfo = editinfo;
+    }
+
+	public override string ToString() => JsonConvert.SerializeObject(this);
+
+	public Url ToUrl(Url url)
+	{
+		url.Redirect = Redirect is null ? url.Redirect : Redirect;
+		url.Password = Password is null ? url.Password : Convert.ToHexString(SHA512.Create().ComputeHash(Encoding.UTF8.GetBytes(Password)));
+		url.Securitytype = Password is null ? url.Securitytype : Password is null || string.IsNullOrEmpty(Password) ? "none" : "password";
+		url.Nsfw = (bool)(Nsfw is null ? url.Nsfw : Nsfw);
+		url.Captcha = (bool)(Captcha is null ? url.Captcha : Captcha);
+		url.Unembedify = (bool)(Unembedify is null ? url.Unembedify : Unembedify);
+		url.Deletedate = DeleteDate == 0 ? url.Deletedate : DeleteDate;
+		url.Editinfo = EditInfo is null ? url.Editinfo : EditInfo;
+
+		return url;
+	}
+}

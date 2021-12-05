@@ -129,4 +129,37 @@ public class ApiController : ControllerBase
 
 		return Ok(new { message = $"Deleted url with id {id}" });
 	}
+
+	[HttpPatch("edit")]
+	public IActionResult EditUrl([FromHeader] string Authorization, [FromQuery] string id, [FromBody] UrlEditRequest body)
+    {
+		var AuthResult = _authorization.checkAuthorization(Authorization);
+
+		if (!AuthResult.Allow || AuthResult.User is null)
+		{
+			return StatusCode(403, AuthResult.Message);
+		}
+
+		Url? url = _urlService.Get(id);
+
+		if (url is null)
+		{
+			return NotFound();
+		}
+
+		if (url.Owner != AuthResult.User.Username)
+		{
+			return StatusCode(401, new { error = "You cant edit url that aren't your" });
+		}
+
+		try
+        {
+			Url editedUrl = body.ToUrl(url);
+			_urlService.Update(id, editedUrl);
+			return Ok(editedUrl);
+		} catch
+        {
+			return StatusCode(500, new { error = "Cannot edit url" });
+		}
+	}
 }
