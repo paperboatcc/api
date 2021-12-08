@@ -13,7 +13,7 @@
     <img src="https://img.shields.io/static/v1?color=7014e8&label=language&message=dotnet&style=for-the-badge"/>
   </a>
   <a href="">
-    <img src="https://img.shields.io/static/v1?color=04977c&label=api+status&message=work+in+progress&style=for-the-badge"/>
+    <img src="https://img.shields.io/static/v1?color=04977c&label=api+status&message=almost+ready&style=for-the-badge"/>
   </a>
 </h2>
 
@@ -30,7 +30,7 @@
 
   <h2>Library used</h2>
 
-  <a href="https://dotnet.microsoft.com/">dotnet</a>, <a href="https://dotnet.microsoft.com/apps/aspnet">asp.net</a>, <a href="https://www.nuget.org/packages/Swashbuckle.AspNetCore/">Swashbuckle.AspNetCore</a>, <a href="https://www.nuget.org/packages/Microsoft.AspNetCore.Mvc.NewtonsoftJson">Microsoft.AspNetCore.Mvc.NewtonsoftJson</a> and <a href="https://www.nuget.org/packages/Otp.NET">Otp.NET</a> are under <a href="https://opensource.org/licenses/MIT">MIT License</a></h3>
+  <a href="https://dotnet.microsoft.com/">dotnet</a>, <a href="https://dotnet.microsoft.com/apps/aspnet">asp.net</a>, <a href="https://www.nuget.org/packages/Swashbuckle.AspNetCore/">Swashbuckle.AspNetCore</a>, <a href="https://www.nuget.org/packages/Microsoft.AspNetCore.Mvc.NewtonsoftJson">Microsoft.AspNetCore.Mvc.NewtonsoftJson</a>, <a href="https://www.nuget.org/packages/Otp.NET">Otp.NET</a> and <a href="https://www.nuget.org/packages/AspNetCoreRateLimit/">AspNetCoreRateLimit</a> are under <a href="https://opensource.org/licenses/MIT">MIT License</a></h3>
 
   <a href="https://mongodb.github.io/mongo-csharp-driver/">MongoDB C# Driver</a> is under <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache-2.0 License</a>
 
@@ -50,6 +50,9 @@
   </li>
   <li>
     <a href="https://github.com/kspearrin/Otp.NET/blob/master/LICENSE.txt">Otp.NET</a>
+  </li>
+  <li>
+    <a href="https://github.com/stefanprodan/AspNetCoreRateLimit/blob/master/LICENSE.md">AspNetCoreRateLimit</a>
   </li>
   <li>
     <a href="https://github.com/mongodb/mongo-csharp-driver/blob/master/License.txt">MongoDB C# Driver</a>

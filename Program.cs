@@ -1,6 +1,7 @@
 using Fasmga;
 using Fasmga.Schema;
 using Fasmga.Services;
+using AspNetCoreRateLimit;
 using Microsoft.Extensions.Options;
 
 string cwd = Directory.GetCurrentDirectory();
@@ -12,14 +13,26 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers().AddNewtonsoftJson(options => options.UseMemberCasing());;
 
+builder.Services.AddMvc(options => options.EnableEndpointRouting = false);
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddOptions();
 
 builder.Services.Configure<FasmgaDatabaseSettings>(builder.Configuration.GetSection(nameof(FasmgaDatabaseSettings)));
 builder.Services.AddSingleton<IFasmgaDatabaseSettings>(sp => sp.GetRequiredService<IOptions<FasmgaDatabaseSettings>>().Value);
 
 builder.Services.AddSingleton<UrlService>();
 builder.Services.AddSingleton<UserService>();
+
+builder.Services.AddMemoryCache();
+builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
+builder.Services.Configure<IpRateLimitPolicies>(builder.Configuration.GetSection("IpRateLimitPolicies"));
+
+builder.Services.AddInMemoryRateLimiting();
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
 
 WebApplication app = builder.Build();
 
@@ -29,6 +42,10 @@ if (app.Environment.IsDevelopment())
 	app.UseSwagger();
 	app.UseSwaggerUI();
 }
+
+app.UseIpRateLimiting();
+
+app.UseMvc();
 
 app.MapControllers();
 

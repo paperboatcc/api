@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Fasmga.Services;
 using Fasmga.Helpers;
-using Newtonsoft.Json;
 
 namespace Fasmga.Controllers;
 
@@ -34,7 +33,7 @@ public class ApiController : ControllerBase
 	[HttpGet("urls")]
 	public IActionResult GetUserUrls([FromHeader] string Authorization)
 	{
-		var AuthResult = _authorization.checkAuthorization(Authorization);
+		var AuthResult = _authorization.checkAuthorization(Authorization, Request);
 
 		if (!AuthResult.Allow || AuthResult.User is null)
 		{
@@ -73,7 +72,7 @@ public class ApiController : ControllerBase
 	[HttpPost("create")]
 	public async Task<IActionResult> CreateUrl([FromHeader] string Authorization, [FromBody] UrlRequest urlRequest)
 	{
-		var AuthResult = _authorization.checkAuthorization(Authorization);
+		var AuthResult = _authorization.checkAuthorization(Authorization, Request);
 
 		if (!AuthResult.Allow || AuthResult.User is null)
 		{
@@ -87,9 +86,13 @@ public class ApiController : ControllerBase
 			return BadRequest(new { message = "Url id is already used!" });
 		}
 
-		_urlService.Create(url);
-
-		return Created("/v1/urls", url);
+		try {
+			_urlService.Create(url);
+			return Created("/v1/urls", url);
+		}
+		catch {
+			return StatusCode(500, new { message = "failed to create url" });
+		}
 	}
 
 	// Here is the explanation for the code above:
@@ -101,7 +104,7 @@ public class ApiController : ControllerBase
 	[HttpDelete("delete")]
 	public IActionResult DeleteUrl([FromHeader] string Authorization, [FromQuery] string id)
 	{
-		var AuthResult = _authorization.checkAuthorization(Authorization);
+		var AuthResult = _authorization.checkAuthorization(Authorization, Request);
 
 		if (!AuthResult.Allow || AuthResult.User is null)
 		{
@@ -123,17 +126,16 @@ public class ApiController : ControllerBase
 		try
 		{
 			_urlService.Remove(url);
+			return Ok(new { message = $"Deleted url with id {id}" });
 		} catch {
 			return StatusCode(500, new { error = "Cannot delete url" });
 		}
-
-		return Ok(new { message = $"Deleted url with id {id}" });
 	}
 
 	[HttpPatch("edit")]
 	public IActionResult EditUrl([FromHeader] string Authorization, [FromQuery] string id, [FromBody] UrlEditRequest body)
     {
-		var AuthResult = _authorization.checkAuthorization(Authorization);
+		var AuthResult = _authorization.checkAuthorization(Authorization, Request);
 
 		if (!AuthResult.Allow || AuthResult.User is null)
 		{
@@ -153,12 +155,11 @@ public class ApiController : ControllerBase
 		}
 
 		try
-        {
+		{
 			Url editedUrl = body.ToUrl(url);
 			_urlService.Update(id, editedUrl);
 			return Ok(editedUrl);
-		} catch
-        {
+		} catch {
 			return StatusCode(500, new { error = "Cannot edit url" });
 		}
 	}

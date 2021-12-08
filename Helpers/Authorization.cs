@@ -10,13 +10,17 @@ class Authorization {
 	{
 		_userService = UserService;
 	}
-	public AuthorizationResponse checkAuthorization(string Authorization)
+	public AuthorizationResponse checkAuthorization(string Authorization, HttpRequest request)
 	{
 		string[] auth = Authorization.Split(" ");
 
 		if (auth.Length != 2 || auth[0] != "Basic")
 		{
 			return new AuthorizationResponse(false, $"Authorization {auth[0]} is invalid or unknown, use Basic authorization", null, null);
+		}
+
+		if (string.IsNullOrEmpty(request.Headers["X-Real-IP"])) {
+			return new AuthorizationResponse(false, "IP invalid, use a real one", null, null);
 		}
 
 		User? user = _userService.Get(auth[1]);
