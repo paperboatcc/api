@@ -128,7 +128,7 @@ public class Url
         switch (value)
         {
             case UrlUniqueValues.ID:
-                while (service.Get().Where(u => u.ID == ID).Count() > 0)
+                while (service.Get().Any(u => u.ID == ID))
                 {
                     string oldID = ID;
                     ID = GenerateID();
@@ -136,25 +136,25 @@ public class Url
                 }
                 break;
             case UrlUniqueValues.qruuid1:
-                while (service.Get().Where(u => u.Qruuid1 == Qruuid1).Count() > 0)
+                while (service.Get().Any(u => u.Qruuid1 == Qruuid1))
                 {
                     Qruuid1 = GenerateUuid1();
                 }
                 break;
             case UrlUniqueValues.qruuid2:
-                while (service.Get().Where(u => u.Qruuid2 == Qruuid2).Count() > 0)
+                while (service.Get().Any(u => u.Qruuid2 == Qruuid2))
                 {
                     Qruuid2 = GenerateUuid2();
                 }
                 break;
             case UrlUniqueValues.securitytotp:
-                while (service.Get().Where(u => u.Securitytotp == Securitytotp).Count() > 0)
+                while (service.Get().Any(u => u.Securitytotp == Securitytotp))
                 {
                     Securitytotp = GenerateTotp();
                 }
                 break;
             default:
-                while (service.Get().Where(u => u.ID == ID).Count() > 0)
+                while (service.Get().Any(u => u.ID == ID))
                 {
                     ID = GenerateID();
                 }

@@ -24,9 +24,7 @@
 
   <h1>Licensing</h1>
 
-  <!-- TODO: update the license file url, but for now is good -->
-
-  This API is under MIT license, you can see the license in the <a href="https://github.com/fasm-ga/api/blob/main/License.md">license.md</a> file</a>
+  This API is under MIT license, you can see the license in the <a href="https://github.com/fasmga/license/blob/main/LICENSE">license.md</a> file</a>
 
   <h2>Library used</h2>
 
@@ -57,8 +55,4 @@
   <li>
     <a href="https://github.com/mongodb/mongo-csharp-driver/blob/master/License.txt">MongoDB C# Driver</a>
   </li>
-
-  <h1 >Re-write</h1>
-
-  <h3 >The API was written in python using <a href="https://sanicframework.org/">sanic</a> library, now it will be rewritten with C#, dotnet and asp.net</h3>
 </div>

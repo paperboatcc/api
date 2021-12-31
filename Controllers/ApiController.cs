@@ -1,4 +1,3 @@
-using Fasmga.Helpers;
 using Fasmga.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,38 +12,29 @@ public class ApiController : ControllerBase
     private readonly UserService _userService;
     private readonly Authorization _authorization;
 
-    public ApiController(UrlService urlService, UserService userService, ILogger<ApiController> logger)
+    public ApiController(UrlService urlService, UserService userService, Authorization authorization, ILogger<ApiController> logger)
     {
         _urlService = urlService;
         _userService = userService;
-        _authorization = new Authorization(_userService);
+        _authorization = authorization;
         _logger = logger;
     }
 
-    // I can leave 404? yes. So why i put 204? because why not? 🙂
-    [HttpGet]
-    [ProducesResponseType(204)]
-    public IActionResult Index()
-    {
-        return NoContent();
-    }
-
-    // Here is the explanation for the code above:
-    // 1. First we check if the user has authorization to use the endpoint.
-    // 2. Get the URLs by User Authorization
-    // 3. Respond with the list of Url 
+    /// <summary>
+    /// Validate user and retrive all url(s) from user
+    /// </summary>
     [HttpGet("urls")]
-    public IActionResult GetUserUrls([FromHeader] string Authorization)
+    public IActionResult GetUserUrls([FromHeader] string authorization)
     {
-        AuthorizationResponse? AuthResult = _authorization.checkAuthorization(Authorization, Request);
+        (bool allow, object message) = _authorization.ValidateUser(authorization, out User? user);
 
-        if (!AuthResult.Allow || AuthResult.User is null)
+        if (!allow || user is null)
         {
-            return StatusCode(403, AuthResult.Message);
+            return StatusCode(403, message);
         }
 
         List<object> urls = new();
-        _urlService.GetUserUrls(AuthResult.User).ForEach(u =>
+        _urlService.GetUserUrls(user).ForEach(u =>
         {
             urls.Add(u.ToObject());
         });
@@ -52,9 +42,9 @@ public class ApiController : ControllerBase
         return Ok(urls);
     }
 
-    // The code above does the following:
-    // 1. Get the URL by ID
-    // 2. Respond with that
+    /// <summary>
+    /// Give back information about the url from the id
+    /// </summary>
     [HttpGet("urls/{id}")]
     public IActionResult GetUrlInfo([FromRoute] string id)
     {
@@ -68,22 +58,20 @@ public class ApiController : ControllerBase
         return Ok(url.ToObject());
     }
 
-    // Here is the explanation for the code above:
-    // 1. First we check if the user has authorization to use the endpoint.
-    // 2. Creates a new Url instance from the request body
-    // 3. Save to database
-    // 4. Respond with the Url
+    /// <summary>
+    /// Validate user with healder and then generate the url
+    /// </summary>
     [HttpPost("create")]
-    public async Task<IActionResult> CreateUrl([FromHeader] string Authorization, [FromBody] UrlRequest urlRequest)
+    public async Task<IActionResult> CreateUrl([FromHeader] string authorization, [FromBody] UrlRequest urlRequest)
     {
-        AuthorizationResponse? AuthResult = _authorization.checkAuthorization(Authorization, Request);
+        (bool allow, object message) = _authorization.ValidateUser(authorization, out User? user);
 
-        if (!AuthResult.Allow || AuthResult.User is null)
+        if (!allow || user is null)
         {
-            return StatusCode(403, AuthResult.Message);
+            return StatusCode(403, message);
         }
 
-        Url? url = await urlRequest.ToUrl(AuthResult.User, _urlService);
+        Url? url = await urlRequest.ToUrl(user, _urlService);
 
         if (url is null)
         {
@@ -101,20 +89,17 @@ public class ApiController : ControllerBase
         }
     }
 
-    // Here is the explanation for the code above:
-    // 1. First we check if the user has authorization to use the endpoint.
-    // 2. Creates a new Url instance from the request body
-    // 3. Check if user can delete that url
-    // 4. Delete the url
-    // 5. Respond to user
+    /// <summary>
+    /// Validate user that make the request and then delete url
+    /// </summary>
     [HttpDelete("delete")]
-    public IActionResult DeleteUrl([FromHeader] string Authorization, [FromQuery] string id)
+    public IActionResult DeleteUrl([FromHeader] string authorization, [FromQuery] string id)
     {
-        AuthorizationResponse? AuthResult = _authorization.checkAuthorization(Authorization, Request);
+        (bool allow, object message) = _authorization.ValidateUser(authorization, out User? user);
 
-        if (!AuthResult.Allow || AuthResult.User is null)
+        if (!allow || user is null)
         {
-            return StatusCode(403, AuthResult.Message);
+            return StatusCode(403, message);
         }
 
         Url? url = _urlService.Get(id);
@@ -124,7 +109,7 @@ public class ApiController : ControllerBase
             return NotFound();
         }
 
-        if (url.Owner != AuthResult.User.Username)
+        if (url.Owner != user.Username)
         {
             return StatusCode(401, new { error = "You cant delete url that aren't your" });
         }
@@ -140,14 +125,17 @@ public class ApiController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Validate user with healder and then edit url
+    /// </summary>
     [HttpPatch("edit")]
-    public IActionResult EditUrl([FromHeader] string Authorization, [FromQuery] string id, [FromBody] UrlEditRequest body)
+    public IActionResult EditUrl([FromHeader] string authorization, [FromQuery] string id, [FromBody] UrlEditRequest body)
     {
-        AuthorizationResponse? AuthResult = _authorization.checkAuthorization(Authorization, Request);
+        (bool allow, object message) = _authorization.ValidateUser(authorization, out User? user);
 
-        if (!AuthResult.Allow || AuthResult.User is null)
+        if (!allow || user is null)
         {
-            return StatusCode(403, AuthResult.Message);
+            return StatusCode(403, message);
         }
 
         Url? url = _urlService.Get(id);
@@ -157,7 +145,7 @@ public class ApiController : ControllerBase
             return NotFound();
         }
 
-        if (url.Owner != AuthResult.User.Username)
+        if (url.Owner != user.Username)
         {
             return StatusCode(401, new { error = "You cant edit url that aren't your" });
         }

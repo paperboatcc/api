@@ -18,6 +18,11 @@ builder.Services.AddMvc(options => options.EnableEndpointRouting = false);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options => 
+{
+  options.AddDefaultPolicy(builder => builder.AllowAnyMethod().AllowAnyHeader().AllowCredentials().SetIsOriginAllowed((hosts) => true));
+});
+
 builder.Services.AddOptions();
 
 builder.Services.Configure<FasmgaDatabaseSettings>(builder.Configuration.GetSection(nameof(FasmgaDatabaseSettings)));
@@ -25,6 +30,7 @@ builder.Services.AddSingleton<IFasmgaDatabaseSettings>(sp => sp.GetRequiredServi
 
 builder.Services.AddSingleton<UrlService>();
 builder.Services.AddSingleton<UserService>();
+builder.Services.AddSingleton<Authorization>();
 
 builder.Services.AddMemoryCache();
 builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
@@ -46,6 +52,8 @@ if (app.Environment.IsDevelopment())
 app.UseIpRateLimiting();
 
 app.UseMvc();
+
+app.UseCors();
 
 app.MapControllers();
 
