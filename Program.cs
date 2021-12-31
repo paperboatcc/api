@@ -1,7 +1,7 @@
+using AspNetCoreRateLimit;
 using Fasmga;
 using Fasmga.Schema;
 using Fasmga.Services;
-using AspNetCoreRateLimit;
 using Microsoft.Extensions.Options;
 
 string cwd = Directory.GetCurrentDirectory();
@@ -11,7 +11,7 @@ DotEnv.Load(dotenvFile);
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers().AddNewtonsoftJson(options => options.UseMemberCasing());;
+builder.Services.AddControllers().AddNewtonsoftJson(options => options.UseMemberCasing()); ;
 
 builder.Services.AddMvc(options => options.EnableEndpointRouting = false);
 
@@ -38,9 +38,9 @@ WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-	app.UseDeveloperExceptionPage();
-	app.UseSwagger();
-	app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseIpRateLimiting();
