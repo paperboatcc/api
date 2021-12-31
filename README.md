@@ -24,7 +24,7 @@
 
   <h1>Licensing</h1>
 
-  This API is under MIT license, you can see the license in the <a href="https://github.com/fasmga/license/blob/main/LICENSE">license.md</a> file</a>
+  This API is under FGALv1 license, you can see the license in the <a href="https://github.com/fasmga/license/blob/main/LICENSE">license.md</a> file</a>
 
   <h2>Library used</h2>
 
