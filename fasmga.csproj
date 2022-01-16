@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Authors>Fleny113</Authors>
-    <Company>fasm.ga</Company>
+    <Company>Fasm.ga</Company>
     <Product>$(AssemblyName) api</Product>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <PackageReadmeFile>README.md</PackageReadmeFile>
