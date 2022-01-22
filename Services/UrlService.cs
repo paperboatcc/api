@@ -1,4 +1,4 @@
-using Fasmga.Schema;
+using Fasmga.Models;
 using MongoDB.Driver;
 
 namespace Fasmga.Services;

@@ -12,12 +12,12 @@ public static class UrlIDGenerator
     {
         string alphabet = "";
 
-        foreach (string t in type.Split('-')) ToAlphabet(t, ref alphabet);
+        foreach (string t in type.Split('-')) GetAlphabet(t, ref alphabet);
 
         return new string(Enumerable.Repeat(alphabet, length).Select(s => s[_random.Next(s.Length)]).ToArray());
     }
 
-    private static string ToAlphabet(string type, ref string chars)
+    private static string GetAlphabet(string type, ref string chars)
     {
         return type switch
         {

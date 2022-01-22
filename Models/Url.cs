@@ -7,7 +7,7 @@ using OtpNet;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Fasmga;
+namespace Fasmga.Models;
 
 public enum UrlUniqueValues
 {

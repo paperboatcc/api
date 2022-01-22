@@ -1,6 +1,6 @@
 using AspNetCoreRateLimit;
 using Fasmga;
-using Fasmga.Schema;
+using Fasmga.Models;
 using Fasmga.Services;
 using Microsoft.Extensions.Options;
 
@@ -18,9 +18,9 @@ builder.Services.AddMvc(options => options.EnableEndpointRouting = false);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddCors(options => 
+builder.Services.AddCors(options =>
 {
-  options.AddDefaultPolicy(builder => builder.AllowAnyMethod().AllowAnyHeader().AllowCredentials().SetIsOriginAllowed((hosts) => true));
+    options.AddDefaultPolicy(builder => builder.AllowAnyMethod().AllowAnyHeader().AllowCredentials().SetIsOriginAllowed((hosts) => true));
 });
 
 builder.Services.AddOptions();
@@ -30,7 +30,7 @@ builder.Services.AddSingleton<IFasmgaDatabaseSettings>(sp => sp.GetRequiredServi
 
 builder.Services.AddSingleton<UrlService>();
 builder.Services.AddSingleton<UserService>();
-builder.Services.AddSingleton<Authorization>();
+builder.Services.AddSingleton<Authentication>();
 
 builder.Services.AddMemoryCache();
 builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));

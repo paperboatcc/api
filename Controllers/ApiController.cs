@@ -1,4 +1,5 @@
 using Fasmga.Services;
+using Fasmga.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Fasmga.Controllers;
@@ -10,13 +11,13 @@ public class ApiController : ControllerBase
     private readonly ILogger<ApiController> _logger;
     private readonly UrlService _urlService;
     private readonly UserService _userService;
-    private readonly Authorization _authorization;
+    private readonly Authentication _authentication;
 
-    public ApiController(UrlService urlService, UserService userService, Authorization authorization, ILogger<ApiController> logger)
+    public ApiController(UrlService urlService, UserService userService, Authentication authorization, ILogger<ApiController> logger)
     {
         _urlService = urlService;
         _userService = userService;
-        _authorization = authorization;
+        _authentication = authorization;
         _logger = logger;
     }
 
@@ -26,7 +27,7 @@ public class ApiController : ControllerBase
     [HttpGet("urls")]
     public IActionResult GetUserUrls([FromHeader] string authorization)
     {
-        (bool allow, object message) = _authorization.ValidateUser(authorization, out User? user);
+        (bool allow, object message) = _authentication.ValidateUser(authorization, out User? user);
 
         if (!allow || user is null)
         {
@@ -64,7 +65,7 @@ public class ApiController : ControllerBase
     [HttpPost("create")]
     public async Task<IActionResult> CreateUrl([FromHeader] string authorization, [FromBody] UrlRequest urlRequest)
     {
-        (bool allow, object message) = _authorization.ValidateUser(authorization, out User? user);
+        (bool allow, object message) = _authentication.ValidateUser(authorization, out User? user);
 
         if (!allow || user is null)
         {
@@ -95,7 +96,7 @@ public class ApiController : ControllerBase
     [HttpDelete("delete")]
     public IActionResult DeleteUrl([FromHeader] string authorization, [FromQuery] string id)
     {
-        (bool allow, object message) = _authorization.ValidateUser(authorization, out User? user);
+        (bool allow, object message) = _authentication.ValidateUser(authorization, out User? user);
 
         if (!allow || user is null)
         {
@@ -131,7 +132,7 @@ public class ApiController : ControllerBase
     [HttpPatch("edit")]
     public IActionResult EditUrl([FromHeader] string authorization, [FromQuery] string id, [FromBody] UrlEditRequest body)
     {
-        (bool allow, object message) = _authorization.ValidateUser(authorization, out User? user);
+        (bool allow, object message) = _authentication.ValidateUser(authorization, out User? user);
 
         if (!allow || user is null)
         {

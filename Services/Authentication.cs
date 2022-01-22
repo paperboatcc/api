@@ -1,10 +1,12 @@
+using Fasmga.Models;
+
 namespace Fasmga.Services;
 
-public class Authorization
+public class Authentication
 {
     private readonly UserService _userService;
 
-    public Authorization(UserService UserService)
+    public Authentication(UserService UserService)
     {
         _userService = UserService;
     }

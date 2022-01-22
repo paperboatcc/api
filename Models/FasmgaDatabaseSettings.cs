@@ -1,4 +1,4 @@
-namespace Fasmga.Schema;
+namespace Fasmga.Models;
 
 public class FasmgaDatabaseSettings : IFasmgaDatabaseSettings
 {
