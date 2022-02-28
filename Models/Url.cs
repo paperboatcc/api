@@ -138,7 +138,7 @@ public class Url
 
     public string GenerateID()
     {
-        if (IdOptions.StaticID is not null)
+        if (IdOptions.StaticID is not null && !IdOptions.StaticID.Contains("@"))
         {
             return IdOptions.StaticID;
         }
@@ -306,7 +306,7 @@ public class CollectionUrl
 
     public string GenerateID()
     {
-        if (IdOptions.StaticID is not null)
+        if (IdOptions.StaticID is not null && !IdOptions.StaticID.Contains("@"))
         {
             return IdOptions.StaticID;
         }
