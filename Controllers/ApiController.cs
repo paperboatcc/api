@@ -63,7 +63,7 @@ public class ApiController : ControllerBase
     /// Validate user with healder and then generate the url
     /// </summary>
     [HttpPost("create")]
-    public async Task<IActionResult> CreateUrl([FromHeader] string authorization, [FromBody] UrlRequest urlRequest)
+    public IActionResult CreateUrl([FromHeader] string authorization, [FromBody] UrlRequest urlRequest)
     {
         (bool allow, object message) = _authentication.ValidateUser(authorization, out User? user);
 
@@ -72,7 +72,7 @@ public class ApiController : ControllerBase
             return StatusCode(403, message);
         }
 
-        Url? url = await urlRequest.ToUrl(user, _urlService);
+        Url? url = urlRequest.ToUrl(user, _urlService);
 
         if (url is null)
         {
