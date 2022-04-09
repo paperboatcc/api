@@ -1,6 +1,7 @@
 using Fasmga.Services;
 using Fasmga.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Fasmga.Controllers;
 
@@ -8,34 +9,24 @@ namespace Fasmga.Controllers;
 [Route("/v1")]
 public class ApiController : ControllerBase
 {
-    private readonly ILogger<ApiController> _logger;
     private readonly UrlService _urlService;
     private readonly UserService _userService;
-    private readonly Authentication _authentication;
 
-    public ApiController(UrlService urlService, UserService userService, Authentication authorization, ILogger<ApiController> logger)
+    public ApiController(UrlService urlService, UserService userService)
     {
         _urlService = urlService;
         _userService = userService;
-        _authentication = authorization;
-        _logger = logger;
     }
 
     /// <summary>
     /// Validate user and retrive all url(s) from user
     /// </summary>
     [HttpGet("urls")]
-    public IActionResult GetUserUrls([FromHeader] string authorization)
+    [Authorize(AuthenticationSchemes = "Authentication")]
+    public IActionResult GetUserUrls()
     {
-        (bool allow, object message) = _authentication.ValidateUser(authorization, out User? user);
-
-        if (!allow || user is null)
-        {
-            return StatusCode(403, message);
-        }
-
         List<object> urls = new();
-        _urlService.GetUserUrls(user).ForEach(u =>
+        _urlService.GetUserUrls(HttpContext.User).ForEach(u =>
         {
             urls.Add(u.ToObject());
         });
@@ -63,16 +54,10 @@ public class ApiController : ControllerBase
     /// Validate user with healder and then generate the url
     /// </summary>
     [HttpPost("create")]
-    public IActionResult CreateUrl([FromHeader] string authorization, [FromBody] UrlRequest urlRequest)
+    [Authorize(AuthenticationSchemes = "Authentication")]
+    public IActionResult CreateUrl([FromBody] UrlRequest urlRequest)
     {
-        (bool allow, object message) = _authentication.ValidateUser(authorization, out User? user);
-
-        if (!allow || user is null)
-        {
-            return StatusCode(403, message);
-        }
-
-        Url? url = urlRequest.ToUrl(user, _urlService);
+        var url = urlRequest.ToUrl(HttpContext.User, _urlService);
 
         if (url is null)
         {
@@ -94,15 +79,8 @@ public class ApiController : ControllerBase
     /// Validate user that make the request and then delete url
     /// </summary>
     [HttpDelete("delete")]
-    public IActionResult DeleteUrl([FromHeader] string authorization, [FromQuery] string id)
+    public IActionResult DeleteUrl([FromQuery] string id)
     {
-        (bool allow, object message) = _authentication.ValidateUser(authorization, out User? user);
-
-        if (!allow || user is null)
-        {
-            return StatusCode(403, message);
-        }
-
         Url? url = _urlService.Get(id);
 
         if (url is null)
@@ -110,7 +88,7 @@ public class ApiController : ControllerBase
             return NotFound();
         }
 
-        if (url.Owner != user.Username)
+        if (url.Owner != ((User)HttpContext.User).Username)
         {
             return StatusCode(401, new { error = "You cant delete url that aren't your" });
         }
@@ -132,13 +110,6 @@ public class ApiController : ControllerBase
     [HttpPatch("edit")]
     public IActionResult EditUrl([FromHeader] string authorization, [FromQuery] string id, [FromBody] UrlEditRequest body)
     {
-        (bool allow, object message) = _authentication.ValidateUser(authorization, out User? user);
-
-        if (!allow || user is null)
-        {
-            return StatusCode(403, message);
-        }
-
         Url? url = _urlService.Get(id);
 
         if (url is null)
@@ -146,7 +117,7 @@ public class ApiController : ControllerBase
             return NotFound();
         }
 
-        if (url.Owner != user.Username)
+        if (url.Owner != ((User)HttpContext.User).Username)
         {
             return StatusCode(401, new { error = "You cant edit url that aren't your" });
         }

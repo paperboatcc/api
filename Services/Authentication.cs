@@ -1,37 +1,93 @@
+using System.Security.Claims;
 using Fasmga.Models;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Primitives;
 
 namespace Fasmga.Services;
 
-public class Authentication
+public class Auth : IAuthenticationHandler
 {
     private readonly UserService _userService;
 
-    public Authentication(UserService UserService)
+    private string? _token { get; set; }
+    private User? _user { get; set; }
+
+    private HttpContext _context { get; set; } = null!;
+
+    public Auth(UserService UserService)
     {
         _userService = UserService;
     }
 
-    /// <summary>
-    /// Validate user based on his ApiToken
-    /// </summary>
-    public (bool, object) ValidateUser(string authorization, out User? user)
+    public Task InitializeAsync(AuthenticationScheme _, HttpContext context)
     {
-        string[] authorizationArr = authorization.Split(" ");
+        Console.WriteLine("Hello world! INIT");
+        _context = context;
+        var header = context.Request.Headers.TryGetValue("Authentication", out StringValues authentication);
 
-        if (authorizationArr.Length != 2 || authorizationArr[0] != "Basic")
+        if (!header || authentication[0] is null)
         {
-            user = null;
-            return (false, new { error = $"Authorization verb {authorizationArr[0]} invalid, use \"Basic <your token>\"" });
+            SendResponse(StatusCodes.Status400BadRequest, new { error = "No authorization header" });
+            return Task.CompletedTask;
         }
 
-        User? user1 = _userService.Get(authorizationArr[1]);
-        user = user1;
+        var auth = authentication[0].Split(" ");
 
-        if (user1 is null)
+        if (auth.Length != 2 || auth[0] != "Basic")
         {
-            return (false, new { error = "User with given token not found" });
+            SendResponse(StatusCodes.Status400BadRequest, new { error = $"Authorization verb {auth[0]} invalid, use 'Basic <your token>'" });
+            return Task.CompletedTask;
         }
 
-        return (true, new { message = "Valid user" });
+        _token = auth[1];
+
+        return Task.CompletedTask;
+    }
+
+    public async Task<AuthenticateResult> AuthenticateAsync()
+    {
+        await ChallengeAsync(null);
+
+        if (_user is null)
+        {
+            return AuthenticateResult.Fail(new Exception("User doesn't exist"));
+        }
+
+        _user.Authenticate();
+
+        var userClaimPrincipal = new ClaimsPrincipal(_user);
+        var authTicket = new AuthenticationTicket(userClaimPrincipal, "Authentication");
+
+        return AuthenticateResult.Success(authTicket);
+    }
+
+    public Task ChallengeAsync(AuthenticationProperties? _)
+    {
+        if (_token is null)
+        {
+            SendResponse(StatusCodes.Status400BadRequest, new { error = "No token provided" });
+            return Task.CompletedTask;
+        }
+
+        _user = _userService.Get(_token);
+
+        return Task.CompletedTask;
+    }
+
+    public Task ForbidAsync(AuthenticationProperties? _)
+    {
+        SendResponse(StatusCodes.Status401Unauthorized, new { error = "You aren't authorized!" });
+
+        return Task.CompletedTask;
+    }
+
+    private void SendResponse(int statusCode, object message)
+    {
+        _context.Response.StatusCode = statusCode;
+        _context.Response.ContentType = "application/json";
+        _context.Response.WriteAsJsonAsync(message);
+
+        _context.Response.StartAsync();
+        _context.Response.CompleteAsync();
     }
 }

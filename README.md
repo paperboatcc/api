@@ -1,5 +1,7 @@
 <h1 align="center">
-  <a href="https://www.fasmga.org"><img src="https://github.com/fasm-ga/fasmga/blob/main/assets/big-fucking-frog.png?raw=true" width="69%"/></a>
+  <a href="https://www.fasmga.org">
+      <img src="https://github.com/fasmga/.github/raw/main/assets/fasmga-wordmark-green.png" width="69%"/>
+  </a>
 </h1>
 
 <h2 align="center">

@@ -1,4 +1,4 @@
-namespace Fasmga;
+namespace Fasmga.Helpers;
 
 public static class DotEnv
 {
